@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0B0E14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="交易看板">
+<meta name="referrer" content="no-referrer">
+<title>交易看板</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+--bg:#0d1119;--surface:#151b25;--surface-2:#1b2330;--border:#2a3443;
+--text:#e5eaf2;--text-dim:#9aa8bc;--accent:#91a9d5;
+--ok:#70c5a4;--warn:#d9b56f;--err:#e18b91;--idle:#92a1b8;
+--ok-bg:rgba(112,197,164,.12);--warn-bg:rgba(217,181,111,.12);
+--err-bg:rgba(225,139,145,.12);--idle-bg:rgba(146,161,184,.12);
+--bg2:var(--bg);--card:var(--surface);--card2:var(--surface-2);--line:var(--border);
+--tx:var(--text);--mut:var(--text-dim);--dim:#8796ac;--acc:var(--accent);--acc2:var(--accent);
+--up:var(--ok);--dn:var(--err);--up-bg:var(--ok-bg);--dn-bg:var(--err-bg);--bad:var(--err);--blue:var(--idle);
+--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;
+--r:16px;--safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px);color-scheme:dark}
+html.redup{--up:var(--err);--dn:var(--ok);--up-bg:var(--err-bg);--dn-bg:var(--ok-bg)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 -apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei UI","Microsoft JhengHei",sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;padding-bottom:calc(84px + var(--safe-b))}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+header{position:sticky;top:0;z-index:20;padding:calc(10px + var(--safe-t)) 18px 10px;background:rgba(11,14,20,.86);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(38,46,64,.6);display:flex;align-items:center;gap:10px}
+header h1{font-size:19px;margin:0;font-weight:700;letter-spacing:.5px}
+header .sub{font-size:12px;color:var(--mut)}
+header .grow{flex:1;min-width:0}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--dim);display:inline-block;margin-right:6px;vertical-align:1px}
+.dot.ok{background:var(--ok);box-shadow:0 0 0 4px rgba(52,211,153,.15)}.dot.warn{background:var(--warn);box-shadow:0 0 0 4px rgba(251,191,36,.15)}.dot.bad{background:var(--bad);box-shadow:0 0 0 4px rgba(248,113,113,.15)}
+.iconbtn{border:1px solid var(--line);background:var(--card);color:var(--tx);border-radius:12px;height:40px;min-width:40px;padding:0 12px;font-size:15px;cursor:pointer}
+.iconbtn:active{transform:scale(.96)}
+.paper{font-size:11px;font-weight:700;color:#0B0E14;background:var(--warn);border-radius:6px;padding:2px 6px;margin-left:6px;vertical-align:2px}
+main{padding:14px 14px 8px;max-width:1180px;margin:0 auto}
+.tab{display:none}.tab.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.grid{display:grid;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card h2{font-size:13px;color:var(--mut);font-weight:600;margin:0 0 10px;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+.card h2 .r{margin-left:auto;font-weight:500;color:var(--dim);font-size:12px}
+.hero{background:radial-gradient(120% 140% at 0% 0%,#2A3C7A 0%,#1A2240 38%,#141A2A 70%);border:1px solid #2F3B63;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.28),transparent 70%)}
+.hero .lbl{font-size:13px;color:#B8C3E0}
+.hero .big{font-size:40px;font-weight:750;letter-spacing:-.5px;margin:2px 0 6px}
+.hero .big small{font-size:17px;color:#B8C3E0;font-weight:600;margin-left:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-size:13px;font-weight:600;background:rgba(255,255,255,.07);color:var(--tx);border:1px solid rgba(255,255,255,.08)}
+.chip.up{color:var(--up);background:color-mix(in srgb,var(--up) 14%,transparent)}.chip.dn{color:var(--dn);background:color-mix(in srgb,var(--dn) 14%,transparent)}
+.chip.warn{color:var(--warn);background:rgba(251,191,36,.12)}.chip.bad{color:var(--bad);background:rgba(248,113,113,.13)}.chip.ok{color:var(--ok);background:rgba(52,211,153,.12)}.chip.blue{color:var(--blue);background:rgba(96,165,250,.13)}.chip.mut{color:var(--mut)}
+.up{color:var(--up)}.dn{color:var(--dn)}.mut{color:var(--mut)}.dim{color:var(--dim)}.warnc{color:var(--warn)}.badc{color:var(--bad)}.okc{color:var(--ok)}
+.book{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:12px 0;border-top:1px solid var(--line)}
+.book:first-of-type{border-top:0;padding-top:2px}
+.book .nm{font-weight:650;font-size:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.book .eq{font-weight:700;font-size:17px;text-align:right}
+.book .meta{font-size:12.5px;color:var(--mut)}
+.book .pc{text-align:right;font-size:13px;font-weight:600}
+.hr-heading{margin:16px 0 4px;padding-top:14px;border-top:1px dashed var(--border);font-size:13px;color:var(--text-dim)}
+.hr-summary{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--text-dim);margin-bottom:8px}
+#shadowCard{border-style:dashed;background:var(--bg)}
+.abwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px}
+table.ab{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
+table.ab th{color:var(--mut);font-weight:600;text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+table.ab td{padding:6px 5px;border-top:1px solid var(--line)}table.ab td:first-child{white-space:normal;min-width:118px;max-width:160px}table.ab .n{text-align:right}
+table.ab tr.grp td{color:var(--dim);font-size:11.5px;padding-top:10px;border-top:1px dashed var(--line)}
+table.ab tr.tot td{font-weight:700;border-top:2px solid var(--line)}
+.abst{font-size:11px;font-weight:700;border-radius:7px;padding:2px 7px;background:var(--idle-bg);color:var(--idle)}
+.abst.ok{background:var(--ok-bg);color:var(--ok)}.abst.warn{background:var(--warn-bg);color:var(--warn)}.abst.bad{background:var(--err-bg);color:var(--err)}
+.abnote{font-size:11.5px;color:var(--dim);margin-top:8px}
+.shadow-entry{padding:12px 0;border-top:1px dashed var(--border);min-width:0;overflow-wrap:anywhere}
+.shadow-entry:first-child{border-top:0;padding-top:0}
+.shadow-head{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:14px}
+.shadow-marker{font-size:10px;letter-spacing:.08em;color:var(--idle)}
+.shadow-pill{font-size:11px;padding:2px 7px;border-radius:7px;background:var(--idle-bg);color:var(--idle)}
+.shadow-status{font-size:11px;padding:2px 7px;border-radius:7px}
+.shadow-status.idle{color:var(--idle);background:var(--idle-bg)}.shadow-status.ok{color:var(--ok);background:var(--ok-bg)}.shadow-status.warn{color:var(--warn);background:var(--warn-bg)}
+.shadow-values{color:var(--text-dim)}
+.shadow-return.ok{color:var(--ok);opacity:.75}.shadow-return.err{color:var(--err);opacity:.75}
+.shadow-details,.shadow-meta{margin-top:6px;font-size:12px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:4px 12px}
+.shadow-values{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;font-size:15px;font-weight:600}
+.shadow-meta{color:var(--dim);font-size:11px}
+.bar{height:6px;border-radius:6px;background:var(--bg2);overflow:hidden;grid-column:1/3;margin-top:6px}
+.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.pos{grid-column:1/3;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.pos>span{font-size:12.5px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:4px 9px}
+.badge{font-size:11.5px;font-weight:700;border-radius:7px;padding:2px 7px}
+.badge.run{background:rgba(52,211,153,.13);color:var(--ok)}.badge.pause{background:rgba(251,191,36,.14);color:var(--warn)}.badge.halt{background:rgba(248,113,113,.15);color:var(--bad)}
+.row{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0;padding-top:0}
+.row .k{color:var(--mut);font-size:13px;min-width:92px;flex:none}
+.row .v{flex:1;font-size:14px;word-break:break-word}
+.row .t{color:var(--dim);font-size:12px;flex:none;margin-left:auto;white-space:nowrap}
+.empty{color:var(--dim);font-size:14px;padding:4px 0}
+.alert{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.alert:first-of-type{border-top:0;padding-top:0}
+.alert .ic{width:34px;height:34px;border-radius:11px;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex:none;font-size:17px}
+.alert .ttl{font-weight:650;font-size:14.5px}
+.alert .msg{color:var(--mut);font-size:13px;white-space:pre-wrap;word-break:break-word;max-height:7.5em;overflow:hidden}
+.alert.p4 .ic{background:rgba(251,191,36,.14)}.alert.p5 .ic{background:rgba(248,113,113,.16)}
+.accs{display:grid;grid-template-columns:1fr;gap:10px}
+.acc{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;border-left:4px solid var(--mut)}
+.acc.run{border-left-color:var(--blue)}.acc.quota{border-left-color:var(--warn)}.acc.disabled{border-left-color:var(--bad);opacity:.75}.acc.reserved{border-left-color:var(--acc2)}.acc.mcool{border-left-color:#22D3EE}
+.acc .hd{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.acc .hd b{font-size:15.5px}
+.acc .st{font-size:13px;font-weight:600}
+.acc.run .st{color:var(--blue)}.acc.quota .st{color:var(--warn)}.acc.disabled .st{color:var(--bad)}.acc.reserved .st{color:var(--acc2)}.acc.mcool .st{color:#22D3EE}.acc.idle .st{color:var(--mut)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:13px}
+.kv span:nth-child(odd){color:var(--mut)}
+.task{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:10px}
+.task:first-of-type{margin-top:0}
+.task .hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.task .hd b{font-size:14.5px;word-break:break-all}
+.task .ds{color:var(--mut);font-size:13px;margin-top:4px}
+.prog{height:7px;border-radius:7px;background:var(--bg2);overflow:hidden;margin-top:9px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--acc2));border-radius:7px}
+.prog.hot i{background:linear-gradient(90deg,var(--warn),var(--bad))}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bigbtn{border:0;border-radius:20px;min-height:96px;padding:14px;color:#fff;font-size:20px;font-weight:750;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;text-align:left;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.25);transition:transform .08s}
+.bigbtn small{font-size:12.5px;font-weight:500;opacity:.85}
+.bigbtn .e{font-size:26px}
+.bigbtn:active{transform:scale(.97)}
+.bigbtn:disabled{opacity:.45}
+.b-pause{background:linear-gradient(135deg,#B7791F,#8A5A12)}.b-resume{background:linear-gradient(135deg,#0F9F6E,#0B6E4F)}.b-report{background:linear-gradient(135deg,#4F6BED,#3B4FC0)}.b-close{background:linear-gradient(135deg,#E5484D,#A3262B)}
+.confirmbar{display:none;margin-top:14px;border-radius:18px;padding:14px;background:rgba(229,72,77,.12);border:1px solid rgba(229,72,77,.45)}
+.confirmbar.on{display:block}
+.confirmbar .cd{font-size:28px;font-weight:800;color:#FF8A8E}
+.wide{width:100%;border:0;border-radius:14px;min-height:54px;font-size:17px;font-weight:700;cursor:pointer}
+.wide.red{background:#E5484D;color:#fff}.wide.ghost{background:var(--card2);color:var(--tx);border:1px solid var(--line)}.wide.blue{background:var(--acc);color:#0B0E14}
+.reply{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:10px}
+.reply:first-of-type{margin-top:0}
+.reply .ttl{font-weight:700;display:flex;gap:8px}
+.reply .msg{white-space:pre-wrap;color:#C9D1DF;font-size:13.5px;margin-top:4px;word-break:break-word}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;background:rgba(14,18,27,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:6px 10px calc(6px + var(--safe-b))}
+nav.tabs button{flex:1;background:none;border:0;color:var(--dim);font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;min-height:56px;cursor:pointer;border-radius:14px}
+nav.tabs button .i{font-size:22px;line-height:1.1;filter:grayscale(1);opacity:.7}
+nav.tabs button.on{color:var(--tx);background:rgba(124,156,255,.1)}
+nav.tabs button.on .i{filter:none;opacity:1}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.sheet-bg.on{display:flex;animation:fade .2s}
+.sheet{width:100%;max-width:520px;background:#141A26;border:1px solid var(--line);border-radius:24px 24px 0 0;padding:20px 18px calc(20px + var(--safe-b))}
+.sheet h3{margin:0 0 6px;font-size:19px}
+.sheet p{margin:0 0 14px;color:var(--mut);font-size:14px}
+.sheet input[type=password],.sheet input[type=text],.sheet textarea{width:100%;font-size:20px;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--tx);outline:none;letter-spacing:2px}
+.sheet textarea{font-size:14px;letter-spacing:0;height:90px}
+.sheet input:focus,.sheet textarea:focus{border-color:var(--acc)}
+.sheet label.ck{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:15px;color:#C9D1DF}
+.sheet label.ck input{width:22px;height:22px;accent-color:var(--acc)}
+.sheet .two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + var(--safe-b));z-index:60;background:#232B3D;color:var(--tx);border:1px solid #33405A;padding:11px 16px;border-radius:14px;font-size:14px;max-width:90vw;box-shadow:0 10px 30px rgba(0,0,0,.4);display:none}
+.toast.on{display:block;animation:fade .2s}
+.setup{max-width:520px;margin:30px auto;padding:0 16px}
+.setup .logo{width:72px;height:72px;border-radius:20px;margin-bottom:14px}
+.banner{background:rgba(124,156,255,.1);border:1px solid rgba(124,156,255,.35);border-radius:14px;padding:12px 14px;font-size:13.5px;color:#C9D1F6;margin-bottom:14px}
+.stale{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.4);color:#F5D68A}
+.seg{display:flex;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:none;color:var(--mut);padding:9px 4px;border-radius:9px;font-size:13.5px;font-weight:600;cursor:pointer}
+.seg button.on{background:var(--card2);color:var(--tx)}
+.hl{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;font-size:13.5px;align-items:center}
+@media (min-width:900px){
+ body{padding-bottom:20px}
+ nav.tabs{position:sticky;top:61px;bottom:auto;background:transparent;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;max-width:1180px;margin:0 auto;padding:12px 14px 0;gap:8px;justify-content:flex-start}
+ nav.tabs button{flex:none;flex-direction:row;gap:8px;font-size:15px;min-height:42px;padding:0 18px;background:var(--card);border:1px solid var(--line)}
+ nav.tabs button .i{font-size:17px}
+ nav.tabs button.on{background:#222B40;border-color:#3A4870}
+ .g2{grid-template-columns:1fr 1fr;align-items:start}.span2{grid-column:1/-1}
+ .accs{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+ .btns{grid-template-columns:repeat(4,1fr)}
+ .sheet-bg{align-items:center}.sheet{border-radius:24px}
+ .toast{bottom:24px}
+}
+.dccard{border-color:#2E3A5C;background:linear-gradient(180deg,#18203A 0%,var(--card) 70%)}
+.dc{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.dc:last-child{border-bottom:0}
+.dc .ic{width:34px;height:34px;flex:none;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;background:#232B3F}
+.dc.buy .ic{background:rgba(52,211,153,.16)}.dc.sell .ic{background:rgba(248,113,113,.16)}.dc.halt .ic{background:rgba(248,113,113,.22)}
+.dc.pause .ic,.dc.wait .ic{background:rgba(251,191,36,.15)}.dc.plan .ic{background:rgba(124,156,255,.16)}
+.dc .tx{flex:1;min-width:0;font-size:15px;line-height:1.45;word-break:break-word}
+.dc .who{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:999px;background:#262F45;color:#AFC0EA;margin-bottom:3px}
+.dc .tm{font-size:12px;color:var(--dim);white-space:nowrap;padding-top:4px}
+.dcsum{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 8px}
+.banner.calm{background:rgba(52,211,153,.10);border-color:rgba(52,211,153,.35);color:#BFF3DD;display:block}
+nav.tabs button.brk .i{font-size:20px}
+
+/* Shared visual system; rendering and interaction hooks stay unchanged. */
+body{line-height:1.55;font-variant-numeric:tabular-nums}
+main{padding:16px 16px 24px;max-width:1184px}
+header{padding:calc(12px + var(--safe-t)) 16px 12px;background:rgba(13,17,25,.96);border-color:var(--border);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+header h1{font-size:18px;letter-spacing:.02em}
+header .sub{margin-top:4px}
+.grid{gap:16px;min-width:0}
+.grid>*{min-width:0}
+.card{padding:16px;border-radius:var(--r)}
+.card h2{font-size:12px;line-height:1.6;letter-spacing:.08em;margin-bottom:16px;flex-wrap:wrap;gap:4px 8px}
+.card h2 .r{font-size:11px;letter-spacing:0;text-align:right;font-variant-numeric:tabular-nums}
+.hero,.dccard{background:var(--surface);border-color:var(--border)}
+.hero{border-top:2px solid var(--accent);padding:24px}
+.hero:after{display:none}
+.hero .lbl{color:var(--text-dim);font-size:12px;letter-spacing:.08em}
+.hero .big{font-size:clamp(36px,6vw,52px);line-height:1.2;letter-spacing:-.03em;margin:8px 0 16px;overflow-wrap:anywhere}
+.hero .big small{color:var(--text-dim);font-size:16px;font-weight:500;letter-spacing:0}
+.chip{font-size:12px;line-height:1.5;padding:4px 8px;border-radius:8px;background:var(--idle-bg);border-color:transparent;max-width:100%;overflow-wrap:anywhere}
+.chip.up{color:var(--up);background:var(--up-bg)}
+.chip.dn{color:var(--dn);background:var(--dn-bg)}
+.chip.ok,.badge.run{color:var(--ok);background:var(--ok-bg)}
+.chip.warn,.badge.pause,.alert.p4 .ic,.dc.pause .ic,.dc.wait .ic{color:var(--warn);background:var(--warn-bg)}
+.chip.bad,.chip.err,.badge.halt,.alert.p5 .ic,.dc.halt .ic{color:var(--err);background:var(--err-bg)}
+.chip.blue,.chip.mut,.badge.idle,.dc .who,.dc.plan .ic{color:var(--idle);background:var(--idle-bg)}
+.badge{border-radius:4px;padding:2px 8px;font-weight:600}
+.dot{background:var(--idle)}
+.dot.ok{background:var(--ok);box-shadow:none}
+.dot.warn{background:var(--warn);box-shadow:none}
+.dot.bad,.dot.err{background:var(--err);box-shadow:none}
+.down,.neg,.err{color:var(--err)}
+.ok{color:var(--ok)}.warn,.hot{color:var(--warn)}
+/* .pos is the existing holdings container, so only its numeric values get status color. */
+.pos .pos{color:var(--ok)}
+.book{grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:16px 0}
+.book .nm{font-size:15px;gap:8px}
+.book .eq{font-size:20px;line-height:1.4}
+.book .meta{font-size:12px;overflow-wrap:anywhere}
+.book .pc{font-size:12px}
+.pos{gap:8px;margin-top:8px}
+.pos>span{border-radius:8px;padding:4px 8px;max-width:100%;overflow-wrap:anywhere}
+.bar,.prog{height:4px;border-radius:4px;background:var(--border)}
+.bar i,.prog i{background:var(--idle);border-radius:4px}
+.prog.hot i{background:var(--warn)}
+.row{gap:12px;padding:12px 0;border-color:rgba(154,168,188,.12)}
+.row .k{min-width:80px;font-size:12px}
+.row .v{min-width:0;line-height:1.65}
+.row .t,.dc .tm{min-width:40px;text-align:right;font-variant-numeric:tabular-nums}
+.row .t{padding-top:2px}
+.alert,.dc{padding:16px 0;border-color:rgba(154,168,188,.12)}
+.alert .ic,.dc .ic{border-radius:8px;background:var(--idle-bg)}
+.dc.buy .ic{color:var(--up);background:var(--up-bg)}
+.dc.sell .ic{color:var(--dn);background:var(--dn-bg)}
+.dc .tx{font-size:14px;line-height:1.7}
+.dc .who{border-radius:4px;padding:2px 8px;font-weight:500}
+.alert .msg,.reply .msg{color:var(--text-dim);line-height:1.7}
+.alert>.dim,.reply .ttl>.dim{font-variant-numeric:tabular-nums;text-align:right}
+.accs{gap:12px}
+.acc,.task,.reply{border-radius:12px;padding:16px}
+.acc{border-left-width:2px}
+.acc.run{border-left-color:var(--ok)}.acc.run .st{color:var(--ok)}
+.acc.quota,.acc.mcool{border-left-color:var(--warn)}
+.acc.quota .st,.acc.mcool .st{color:var(--warn)}
+.acc.disabled{border-left-color:var(--err);opacity:1}.acc.disabled .st{color:var(--err)}
+.acc.reserved,.acc.idle{border-left-color:var(--idle)}
+.acc.reserved .st,.acc.idle .st{color:var(--idle)}
+.kv{grid-template-columns:auto minmax(0,1fr);gap:8px 12px;font-size:12px}
+.kv span:nth-child(even){text-align:right;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.task .ds{line-height:1.65;overflow-wrap:anywhere}
+.hl{grid-template-columns:auto minmax(0,1fr) auto;font-size:12px;gap:12px 8px}
+.hl>.num{text-align:right}
+.hl>.mut{overflow-wrap:anywhere}
+.iconbtn{min-height:44px;min-width:44px;border-radius:12px}
+.paper{color:var(--warn);background:var(--warn-bg);font-weight:600;border-radius:4px;padding:2px 8px}
+.banner{background:var(--idle-bg);border-color:var(--border);color:var(--text-dim);border-radius:12px;padding:12px 16px;line-height:1.7;margin-bottom:16px}
+.stale{background:var(--warn-bg);border-color:var(--warn);color:var(--warn)}
+.banner.calm{background:var(--err-bg);border-color:rgba(225,139,145,.3);color:var(--text-dim)}
+#tab-cmd>.card{border-top-color:var(--err)}
+.bigbtn{border:1px solid var(--border);border-radius:12px;box-shadow:none;min-height:120px;padding:16px;font-size:18px;gap:12px}
+.bigbtn small{font-size:12px;line-height:1.6;opacity:1;color:var(--text-dim)}
+.b-pause{background:var(--warn-bg);color:var(--warn)}
+.b-resume{background:var(--ok-bg);color:var(--ok)}
+.b-report{background:var(--idle-bg);color:var(--accent)}
+.b-close{background:var(--err-bg);color:var(--err);border-color:rgba(225,139,145,.45)}
+.wide.red{background:#a9404b;color:#fff;border:1px solid var(--err)}
+.confirmbar{border-radius:12px;padding:16px;background:var(--err-bg);border-color:var(--err)}
+.confirmbar .cd{color:var(--err)}
+.seg button{min-height:44px}
+nav.tabs{background:rgba(13,17,25,.97);padding:8px 12px calc(8px + var(--safe-b));gap:8px}
+nav.tabs button{color:var(--text-dim);border-radius:12px}
+nav.tabs button.on{color:var(--accent);background:var(--idle-bg)}
+nav.tabs button.brk{color:var(--err)}
+nav.tabs button.brk.on{color:var(--err);background:var(--err-bg);border-color:var(--err)}
+.sheet{background:var(--surface);padding:24px 16px calc(24px + var(--safe-b))}
+.sheet input,.sheet textarea,.wide,.reply{border-radius:12px}
+.toast{background:var(--surface-2);border-color:var(--border);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media(min-width:900px){
+ /* Match the 1184px container and 16px inner padding used by main and tabs. */
+ header{min-height:calc(84px + var(--safe-t));padding-left:max(16px,calc((100% - 1184px)/2 + 16px));padding-right:max(16px,calc((100% - 1184px)/2 + 16px))}
+ .card h2,header .sub,.card h2 .r,.hero .lbl,.chip,.badge,.paper,
+ .book .meta,.book .pc,.pos>span,.row .k,.row .t,.dc .who,.dc .tm,
+ .kv,.hl,.bigbtn small{font-size:13px}
+ /* Rendered metadata and pills also carry inline font sizes. */
+ .chip[style],.mut[style*="font-size:12"],.dim[style*="font-size:12"]{font-size:13px!important}
+ nav.tabs{top:calc(84px + var(--safe-t));max-width:1184px;padding:12px 16px;background:var(--bg);gap:8px}
+ nav.tabs button{min-height:44px;padding:0 24px}
+ nav.tabs button.on{background:var(--idle-bg);border-color:var(--accent)}
+ main{padding-top:12px}
+ .g2{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+ .card{padding:24px}
+ .hero{padding:24px}
+ .accs{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #vm,#sys{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px;align-items:start}
+ #vm>.row,#sys>.row{padding:12px 0;border-top:1px solid rgba(154,168,188,.12)}
+ .sheet{padding:24px}
+}
+@media(max-width:480px){
+ .book .eq{font-size:18px}
+ .book .pc{max-width:160px}
+ .card h2 .r{max-width:65%;line-height:1.5}
+ .row{gap:8px;flex-wrap:wrap}
+ .row .v{flex-basis:calc(100% - 96px)}
+ .row .t{margin-left:auto}
+ .alert,.dc{gap:8px}
+ .alert .ic,.dc .ic{width:28px;height:28px;font-size:15px}
+ .reply .ttl{flex-wrap:wrap}
+ .reply .ttl>span{min-width:0;overflow-wrap:anywhere}
+ .seg{flex-wrap:wrap}
+ .seg button{min-width:72px}
+}
+@media(prefers-reduced-motion:reduce){.tab.on,.sheet-bg.on,.toast.on{animation:none}.bigbtn{transition:none}}
+</style>
+</head>
+<body>
+<div id="setup" class="setup" style="display:none">
+  <img class="logo" src="icon-192.png" alt="">
+  <h1 style="margin:0 0 6px">交易看板<span class="paper">紙上交易</span></h1>
+  <p class="mut">第一次使用：用手機相機掃電腦桌面上的「手機看板設定」QR 碼（或點設定連結），就會自動設定好。這個網頁本身不含任何通行碼。</p>
+  <div class="card" style="margin-top:16px">
+    <h2>或手動貼上通行碼</h2>
+    <textarea id="topicIn" placeholder="貼上設定連結或通行碼" autocomplete="off" autocapitalize="off" spellcheck="false" style="width:100%;font-size:14px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--tx);height:80px"></textarea>
+    <button class="wide blue" style="margin-top:10px" id="topicSave">開始使用</button>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+<header>
+  <div class="grow">
+    <h1>交易看板<span class="paper">紙上</span></h1>
+    <div class="sub"><span class="dot" id="hdDot"></span><span id="hdSub">讀取中…</span></div>
+  </div>
+  <button class="iconbtn" id="refreshBtn" title="立即更新">↻</button>
+</header>
+<nav class="tabs">
+  <button data-tab="trade" class="on"><span class="i">📈</span>交易</button>
+  <button data-tab="compute"><span class="i">🧠</span>算力</button>
+  <button data-tab="cmd" class="brk"><span class="i">🛑</span>緊急煞車</button>
+</nav>
+<main>
+  <div id="installTip" class="banner" style="display:none">要像 App 一樣用：按 Safari 下方的「分享」⬆️ →「加入主畫面」。之後從主畫面的圖示打開。</div>
+  <div id="staleTip" class="banner stale" style="display:none"></div>
+
+  <section class="tab on" id="tab-trade">
+    <div class="grid g2">
+      <div class="card hero span2">
+        <div class="lbl">紙上總權益</div>
+        <div class="big num" id="totEq">—</div>
+        <div class="chips" id="heroChips"></div>
+      </div>
+      <div class="card span2" id="memeCard" style="display:none"><h2>迷因幣模擬盤（100U）</h2><div id="meme"></div></div>
+      <div class="card span2 dccard"><h2>今天的決定<span class="r">系統自己判斷・誰決定的</span></h2><div id="dc"></div></div>
+      <div class="card"><h2>各帳本<span class="r" id="bookAt"></span></h2><div id="books"></div></div>
+      <div class="card" id="shadowCard" style="display:none"><h2>影子帳本（觀察用・不是真實部位）</h2><div id="shadow"></div></div>
+      <div class="card span2"><h2>全部模擬策略<span class="r" id="abAt"></span></h2><div id="ab"></div></div>
+      <div class="grid">
+        <div class="card"><h2>今天的訊號與核准</h2><div id="sigs"></div></div>
+        <div class="card"><h2>今天的成交</h2><div id="trades"></div></div>
+        <div class="card" id="hlCard"><h2>Hyperliquid 聰明錢共識</h2><div id="hl"></div></div>
+      </div>
+      <div class="card span2"><h2>最新通知<span class="r">停機・買進・主機健康</span></h2><div id="alerts"></div></div>
+      <div class="card span2"><h2>主機與同步</h2><div id="sys"></div></div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-compute">
+    <div class="grid g2">
+      <div class="card span2"><h2>總覽<span class="r" id="cmpAt"></span></h2><div class="pills" id="cmpPills"></div></div>
+      <div class="card span2"><h2 id="vmHead">雲端主機</h2><div id="vm"></div></div>
+      <div class="card span2" id="farmCard" style="display:none"><h2>回測進度</h2><div id="farm"></div></div>
+      <div class="card span2" id="dsbCard"><h2>DeepSeek</h2><div class="row"><div class="v" id="dsb" style="font-size:17px;font-weight:600">—</div></div></div>
+      <div class="card span2"><h2>Google 帳號（6 個）</h2><div class="accs" id="accs"></div></div>
+      <div class="card"><h2>正在跑的研究</h2><div id="runs"></div></div>
+      <div class="card"><h2>排隊中<span class="r" id="pendN"></span></h2><div id="pend"></div></div>
+      <div class="card span2"><h2>最近完成</h2><div id="res"></div></div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-cmd">
+    <div class="banner calm">平常不用按，系統會自己判斷下單。這裡只在你想緊急踩煞車時用（只動紙上帳本）。</div>
+    <div class="card" style="margin-bottom:14px">
+      <h2>緊急煞車<span class="r">只動紙上帳本，不會下真實單</span></h2>
+      <div class="btns">
+        <button class="bigbtn b-pause" data-cmd="暫停"><span class="e">⏸️</span><span>暫停<br><small>不再開新倉，停損照常</small></span></button>
+        <button class="bigbtn b-resume" data-cmd="恢復"><span class="e">▶️</span><span>恢復<br><small>解除指令設定的暫停</small></span></button>
+        <button class="bigbtn b-report" data-cmd="報告"><span class="e">📋</span><span>報告<br><small>權益、持倉、模式</small></span></button>
+        <button class="bigbtn b-close" data-cmd="全部平倉"><span class="e">🧯</span><span>全部平倉<br><small>需要再確認一次</small></span></button>
+      </div>
+      <div class="confirmbar" id="confirmBar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="flex:1"><b>已送出「全部平倉」</b><div class="mut" style="font-size:13px">5 分鐘內按確認才會真的（紙上）平倉</div></div>
+          <div class="cd num" id="cdTxt">5:00</div>
+        </div>
+        <button class="wide red" style="margin-top:12px" id="confirmClose">確認平倉</button>
+      </div>
+    </div>
+    <div class="grid g2">
+      <div class="card"><h2>指令回覆<span class="r" id="waitTxt"></span></h2><div id="replies"></div></div>
+      <div class="card"><h2>設定</h2>
+        <div class="row"><div class="k">PIN</div><div class="v" id="pinState"></div></div>
+        <div class="row"><div class="k">漲跌顏色</div><div class="v"><div class="seg" id="colorSeg"><button data-c="g">綠漲紅跌</button><button data-c="r">紅漲綠跌</button></div></div></div>
+        <div class="row"><div class="k">安全</div><div class="v mut" style="font-size:13px">1 小時內 PIN 錯 3 次會鎖 24 小時；每小時最多 10 個指令；超過 10 分鐘的指令不處理。</div></div>
+        <div class="row"><div class="k">這台裝置</div><div class="v"><button class="wide ghost" id="resetBtn" style="min-height:44px;font-size:15px">清除這台裝置的設定</button></div></div>
+      </div>
+    </div>
+  </section>
+</main>
+</div>
+
+<div class="sheet-bg" id="sheetBg"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const NTFY="https://ntfy.sh";
+const K={t:"cd_t",pin:"cd_pin",pay:"cd_last",cmp:"cd_last_cmp",col:"cd_color",close:"cd_close_until"};
+const TOPIC_RE=/^[A-Za-z0-9_-]{8,64}$/;
+let topic=null, dataTopic=null, P=null, C=null, human=[], sessPin=null, sessPinAt=0, waitSince=0, waitUntil=0, pollT=null, lastSent=null;
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const standalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+const isPC=new URLSearchParams(location.hash.slice(1)).get("pc")==="1"||LS.get("cd_pc")==="1";
+
+// ---------- time / number helpers ----------
+const pt=s=>{if(!s)return null;const d=new Date(typeof s==="number"?s*1000:s);return isNaN(d)?null:d};
+const pad=n=>String(n).padStart(2,"0");
+function hm(d){d=pt(d);if(!d)return"—";const n=new Date();const same=d.toDateString()===n.toDateString();return(same?"":`${d.getMonth()+1}/${d.getDate()} `)+`${pad(d.getHours())}:${pad(d.getMinutes())}`}
+function ago(d){d=pt(d);if(!d)return"";const m=Math.round((Date.now()-d)/60000);if(m<1)return"剛剛";if(m<60)return`${m} 分前`;const h=Math.floor(m/60);if(h<24)return`${h} 小時前`;return`${Math.floor(h/24)} 天前`}
+function mins(d){d=pt(d);return d?Math.max(0,(Date.now()-d)/60000):null}
+const f2=v=>v==null||isNaN(v)?"—":Number(v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const sg=v=>v>0?"+":v<0?"−":"";
+const cls=v=>v>0.0001?"up":v<-0.0001?"dn":"mut";
+function fpx(v){if(v==null)return"—";v=Number(v);return v>=1000?v.toLocaleString("en-US",{maximumFractionDigits:1}):v>=1?v.toFixed(3):v.toPrecision(4)}
+
+// ---------- setup ----------
+function parseTopic(s){s=(s||"").trim();const m=s.match(/[#&?]t=([A-Za-z0-9_-]{8,64})/);if(m)return m[1];const m2=s.match(/ntfy\.sh\/([A-Za-z0-9_-]{8,64})/);if(m2)return m2[1];return TOPIC_RE.test(s)?s:null}
+function readFragment(){
+  const h=new URLSearchParams(location.hash.slice(1));const t=h.get("t");
+  if(h.get("pc")==="1")LS.set("cd_pc","1");
+  if(t&&TOPIC_RE.test(t)){LS.set(K.t,t);
+    // In Safari (not yet on the home screen) keep the fragment so "加入主畫面" captures it; otherwise hide it from the address bar.
+    if(standalone()||isPC)history.replaceState(null,"",location.pathname+location.search);}
+}
+async function hmacTopic(t){const e=new TextEncoder();const k=await crypto.subtle.importKey("raw",e.encode(t),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
+  const s=new Uint8Array(await crypto.subtle.sign("HMAC",k,e.encode("cd-data-v1")));return"cd"+[...s].map(b=>b.toString(16).padStart(2,"0")).join("").slice(0,30)}
+
+// ---------- ntfy ----------
+async function poll(t,since){const r=await fetch(`${NTFY}/${t}/json?poll=1&since=${since}`,{cache:"no-store"});if(!r.ok)throw new Error("ntfy "+r.status);
+  return(await r.text()).split("\n").filter(Boolean).map(l=>{try{return JSON.parse(l)}catch(e){return null}}).filter(m=>m&&m.event==="message")}
+async function decode(m){m=(m||"").trim();if(m.startsWith("z:")){const bin=Uint8Array.from(atob(m.slice(2)),c=>c.charCodeAt(0));
+  const st=new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"));return JSON.parse(await new Response(st).text())}return JSON.parse(m)}
+async function loadData(){
+  const msgs=await poll(dataTopic,"6h");let latest=null,latestCmp=null;
+  // newest first, stop once both the newest payload and the newest compute payload are found (keeps attachment fetches to 1-2 per poll)
+  const cd=msgs.filter(m=>m.title==="cd"||(m.tags||[]).includes("cd")).sort((a,b)=>b.time-a.time);
+  for(const m of cd){let p=null;try{p=await decode(m.message)}catch(e){p=null}
+    // ntfy.sh stores bodies > 4 KB as an attachment (message = "You received a file..."): read the attachment instead (2026-10-27)
+    if((!p||typeof p!=="object")&&m.attachment&&m.attachment.url){try{const r=await fetch(m.attachment.url,{cache:"no-store"});p=r.ok?await decode(await r.text()):null}catch(e){p=null}}
+    if(!p||typeof p!=="object")continue;
+    p._t=m.time;if(!latest)latest=p;if(p.accs&&!latestCmp)latestCmp=p;if(latest&&latestCmp)break}
+  if(latest){P=latest;LS.set(K.pay,JSON.stringify(P))}
+  if(latestCmp){C=latestCmp;LS.set(K.cmp,JSON.stringify(C))}
+}
+async function loadHuman(){human=await poll(topic,"24h")}
+const isCmdText=m=>/^\s*指令/.test(m.message||"");
+const isReply=m=>(m.tags||[]).includes("cmdreply");
+
+// ---------- render: trade ----------
+function stateBadge(s){return s==="halted"?'<span class="badge halt">停機</span>':s==="cmd_pause"?'<span class="badge pause">指令暫停</span>':s==="pause"?'<span class="badge pause">暫停</span>':'<span class="badge run">運作中</span>'}
+function renderTrade(){
+  renderMeme(C || P);
+  const dk=P&&P.dk;
+  if(!dk){$("#totEq").textContent="—";$("#heroChips").innerHTML='<span class="chip mut">還沒有交易資料（等下一次上傳，最多 15 分鐘）</span>';$("#books").innerHTML='<div class="empty">—</div>';}
+  else{
+    const tot=dk.tot,tb=dk.tb,d=tb?tot-tb:null,dp=tb?(tot/tb-1)*100:null;
+    const start=(dk.bk||[]).reduce((a,b)=>a+(b[4]||0),0),sp=start?(tot/start-1)*100:null;
+    $("#totEq").innerHTML=`${f2(tot)}<small>USDT</small>`;
+    const halted=(dk.bk||[]).filter(b=>b[5]!=="run");
+    let ch=`<span class="chip ${cls(d)} num">今天 ${d==null?"—":sg(d)+f2(Math.abs(d))} U（${dp==null?"—":sg(dp)+Math.abs(dp).toFixed(2)}%）</span>`;
+    if(start)ch+=`<span class="chip ${cls(sp)} num">起始 ${f2(start)} → ${sg(sp)}${Math.abs(sp).toFixed(2)}%</span>`;
+    ch+=halted.length?`<span class="chip warn">${halted.length} 個帳本暫停/停機</span>`:'<span class="chip ok">全部運作中</span>';
+    ch+=dk.fb?'<span class="chip warn">雲端自動模式</span>':"";
+    if(dk.pxok===false)ch+='<span class="chip warn">即時價格抓不到，用進場價</span>';
+    $("#heroChips").innerHTML=ch;
+    $("#bookAt").textContent=hm(dk.t);
+    const mx=Math.max(...(dk.bk||[]).map(b=>b[2]||0),1);
+    const renderBook=b=>{const[nm,zh,eq,base,st,state,pos]=b;const dd=base?eq-base:null,tp=st?(eq/st-1)*100:null;
+      return`<div class="book"><div class="nm">${esc(zh)} ${stateBadge(state)}</div><div class="eq num">${f2(eq)}</div>
+      <div class="meta">${pos.length?pos.length+" 個持倉":"空手"}${st?` ・起始 ${f2(st)}`:""}</div>
+      <div class="pc num"><span class="${cls(dd)}">今 ${dd==null?"—":sg(dd)+f2(Math.abs(dd))}</span>${tp==null?"":` <span class="${cls(tp)}">・${sg(tp)}${Math.abs(tp).toFixed(1)}%</span>`}</div>
+      <div class="bar"><i style="width:${Math.max(3,eq/mx*100).toFixed(1)}%"></i></div>
+      ${pos.length?`<div class="pos">${pos.map(p=>`<span class="num">${esc(String(p[0]).replace("USDT",""))} <b class="${cls(p[3])}">${p[3]==null?"—":sg(p[3])+Math.abs(p[3]).toFixed(2)+"%"}</b> <span class="dim">${fpx(p[1])}→${fpx(p[2])}</span></span>`).join("")}</div>`:""}</div>`};
+    const books=dk.bk||[],hr=books.filter(b=>String(b[0]??"").startsWith("hr_"));
+    if(!hr.length)$("#books").innerHTML=books.map(renderBook).join("");
+    else{
+      const regular=books.filter(b=>!String(b[0]??"").startsWith("hr_"));
+      const eq=hr.reduce((sum,b)=>sum+Number(b[2]??0),0);
+      const based=hr.filter(b=>b[3]!=null),change=based.length?based.reduce((sum,b)=>sum+Number(b[2]??0)-Number(b[3]),0):null;
+      $("#books").innerHTML=regular.map(renderBook).join("")+`<h3 class="hr-heading">HR 策略（研究上線的小帳本）</h3><div class="hr-summary num"><span>${hr.length} 個帳本</span><span>總權益 ${f2(eq)} U</span><span class="${cls(change)}">今天 ${change==null?"—":sg(change)+f2(Math.abs(change))} U</span></div>`+hr.map(renderBook).join("");
+    }
+  }
+  {
+    const sh=(P&&(P.shadows||(P.dk&&P.dk.shadows)))||null;
+    const visible=Array.isArray(sh)&&sh.length>0;
+    $("#shadowCard").style.display=visible?"":"none";
+    $("#shadow").innerHTML=visible?sh.map(entry=>{
+      const x=entry??{},status=x.status??"—",statusText=status==="waiting"?"等待開始":status==="running"?"運作中":status;
+      const statusClass=status==="waiting"?"idle":status==="running"?"ok":"warn";
+      const market=x.market??"—",equity=x.equity??null,ret=x.return_pct??null;
+      const start=x.start??x.start_date??"—",now=new Date(),pad=n=>String(n).padStart(2,"0");
+      const today=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+      const future=typeof start==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(start)&&start>today;
+      const generated=x.generated_at??"—",generatedDate=typeof generated==="string"?new Date(generated):null;
+      const generatedText=generatedDate&&!Number.isNaN(generatedDate.getTime())?`${pad(generatedDate.getMonth()+1)}/${pad(generatedDate.getDate())} ${pad(generatedDate.getHours())}:${pad(generatedDate.getMinutes())}`:generated;
+      const returnClass=ret>0?"ok":ret<0?"err":"";
+      const open=Array.isArray(x.open_positions)?x.open_positions.length:0,closed=Array.isArray(x.closed_trades)?x.closed_trades.length:0;
+      return`<div class="shadow-entry"><div class="shadow-head"><span class="shadow-marker">SHADOW</span><b>${esc(x.label??"影子帳本")}</b>${x.observation_only===true||x.affects_orders===false?'<span class="shadow-pill">觀察用・不下單</span>':""}<span class="shadow-status ${statusClass}">${esc(statusText)}</span></div>
+      <div class="shadow-details"><span>策略 ${esc(x.strategy??"—")}</span><span>市場 ${esc(market==="perp"?"永續":market)}</span><span>槓桿 ${esc(x.leverage==null?"—":String(x.leverage)+"x")}</span></div>
+      <div class="shadow-details num"><span>開始 ${esc(start)}${future?'<span class="dim">（尚未開始）</span>':""}</span><span>起始資金 ${esc(f2(x.start_capital??null))} U</span></div>
+      <div class="shadow-values num"><span>權益 ${esc(f2(equity))} U</span><span class="shadow-return ${returnClass}">報酬 ${esc(ret==null?"—":sg(ret)+f2(Math.abs(ret))+"%")}</span></div>
+      <div class="shadow-details num"><span>持倉 ${esc(open)}</span><span>已平倉 ${esc(closed)}</span></div>
+      <div class="shadow-meta num"><span>資料日期 ${esc(x.data_last_day??"—")}</span><span>產生時間 ${esc(generatedText)}</span></div></div>`;
+    }).join(""):"";
+  }
+  // signals & approvals
+  if(dk){const s=dk.sig||{},a=dk.apr||{};const today=d=>{d=pt(d);return d&&d.toDateString()===new Date().toDateString()};
+    let h=`<div class="row"><div class="k">市場狀態</div><div class="v">${s.bull===true?'<span class="chip up">多頭</span>':s.bull===false?'<span class="chip dn">非多頭</span>':"—"}</div></div>`;
+    h+=`<div class="row"><div class="k">掃描訊號</div><div class="v">${s.n??0} 個${s.act&&s.act.length?`・可進場 <b>${s.act.map(esc).join("、")}</b>`:"・沒有可進場"}${s.near&&s.near.length?`<div class="mut" style="font-size:12.5px">差一點：${s.near.map(esc).join("、")}</div>`:""}</div><div class="t">${s.at?(today(s.at)?"":"非今天 ")+hm(s.at):""}</div></div>`;
+    h+=`<div class="row"><div class="k">風控核准</div><div class="v">${a.ok&&a.ok.length?a.ok.map(x=>`<span class="chip ok">${esc(String(x[0]).replace("USDT",""))}${x[1]?` ${f2(x[1])}U`:""}</span>`).join(" "):"沒有核准"}${a.rej?`<span class="mut">・否決 ${a.rej}</span>`:""}</div><div class="t">${a.at?(today(a.at)?"":"非今天 ")+hm(a.at):""}</div></div>`;
+    $("#sigs").innerHTML=h;
+    $("#trades").innerHTML=(dk.tr&&dk.tr.length)?dk.tr.map(t=>`<div class="row"><div class="k">${esc(t[0])}</div><div class="v"><b class="${/sell|close|exit/i.test(t[1]||"")?"dn":"up"}">${/sell|close|exit/i.test(t[1]||"")?"賣":"買"}</b> ${esc(String(t[2]||"").replace("USDT",""))}</div><div class="t num">${t[3]==null?"":f2(t[3])+" U"}</div></div>`).join(""):'<div class="empty">今天還沒有成交</div>';
+    if(dk.hl&&dk.hl.top&&dk.hl.top.length){$("#hlCard").style.display="";$("#hl").innerHTML=`<div class="hl">${dk.hl.top.map(r=>`<b>${esc(r[0])}</b><span class="mut">${esc(r[1]||"")}</span><span class="num"><span class="up">多 ${r[2]??0}</span> / <span class="dn">空 ${r[3]??0}</span></span>`).join("")}</div><div class="dim" style="font-size:12px;margin-top:8px">${dk.hl.w?dk.hl.w+" 個錢包・":""}${hm(dk.hl.at)}</div>`}
+    else{$("#hlCard").style.display="";$("#hl").innerHTML='<div class="empty">還沒有資料（雲端主機開始追蹤後會出現）</div>'}
+  }else{$("#sigs").innerHTML=$("#trades").innerHTML='<div class="empty">—</div>';$("#hl").innerHTML='<div class="empty">—</div>'}
+  // alerts (human topic: never show command texts — they carry the PIN)
+  const al=human.filter(m=>!isCmdText(m)&&!isReply(m)&&m.title!=="cd").sort((a,b)=>b.time-a.time).slice(0,12);
+  $("#alerts").innerHTML=al.length?al.map(m=>{const t=(m.title||"")+" "+(m.message||"");const ic=/停機|halt|⛔|🛑/i.test(t)?"🛑":/買進|BUY|進場/i.test(t)?"🟢":/賣|平倉|出場/.test(t)?"🔻":/記憶體|CPU|磁碟|主機|VM|看門狗/i.test(t)?"🖥️":/研究|算力|帳號/.test(t)?"🧠":"🔔";
+    return`<div class="alert p${m.priority||3}"><div class="ic">${ic}</div><div style="flex:1;min-width:0"><div class="ttl">${esc(m.title||"通知")}</div><div class="msg">${esc(m.message||"")}</div></div><div class="dim" style="font-size:12px;white-space:nowrap">${hm(m.time)}</div></div>`}).join(""):'<div class="empty">24 小時內沒有通知</div>';
+  // system
+  let sh="";
+  if(dk){sh+=`<div class="row"><div class="k">運作模式</div><div class="v">${dk.fb?'<b class="warnc">雲端自動模式</b>（Bobo 離線）':'<b class="okc">正常</b>（Bobo 在線，雲端主機寫帳本）'}</div></div>`;
+    sh+=`<div class="row"><div class="k">本機最後聯絡</div><div class="v">${hm(dk.box_last)} <span class="mut">${ago(dk.box_last)}</span></div></div>`;
+    sh+=`<div class="row"><div class="k">雲端主機回報</div><div class="v">${hm(dk.vm_at)} <span class="mut">${ago(dk.vm_at)}</span></div></div>`;
+    if(dk.halts&&dk.halts.length)sh+=`<div class="row"><div class="k">暫停/停機</div><div class="v warnc">${dk.halts.map(esc).join("、")}</div></div>`;}
+  const vm=(C&&C.vm)||(P&&P.vm);
+  if(vm&&vm.rows)sh+=vm.rows.filter(r=>/連線|看門狗|記憶體|自動模式/.test(r.k)).map(r=>`<div class="row"><div class="k">${esc(r.k)}</div><div class="v ${lvC(r.l)}">${esc(r.v)}</div></div>`).join("");
+  $("#sys").innerHTML=sh||'<div class="empty">—</div>';
+}
+const lvC=l=>l==="ok"?"":l==="warn"?"warnc":l==="bad"?"badc":"mut";
+
+
+// ---------- render: today's decisions ----------
+const DCK={buy:["🟢","買進"],sell:["🔻","賣出"],skip:["⏭️","不買"],halt:["🛑","停機"],pause:["⏸️","暫停"],hold:["➖","不動"],plan:["🧭","策略決定"],wait:["⏳","等待"]};
+function renderDecisions(){
+  const dk=P&&P.dk;const el=$("#dc");
+  if(!dk){el.innerHTML='<div class="empty">—</div>';return}
+  let dc=dk.dc;
+  if(!Array.isArray(dc)){dc=[];const a=dk.apr||{};const today=d=>{d=pt(d);return d&&d.toDateString()===new Date().toDateString()};
+    if(a.at&&today(a.at)){(a.ok||[]).forEach(x=>dc.push([hm(a.at),a.by||"Risk 例行（Bobo）","buy",`核准買 ${String(x[0]).replace("USDT","")}`]));if(!(a.ok||[]).length)dc.push([hm(a.at),a.by||"Risk 例行（Bobo）","skip",`今天不買${a.rej?`（否決 ${a.rej} 個）`:""}`])}}
+  const n={};dc.forEach(d=>n[d[2]]=(n[d[2]]||0)+1);
+  let sum=`<div class="dcsum"><span class="chip ok">🤖 全自動・你不用操作</span>`;
+  if(n.buy)sum+=`<span class="chip up">買 ${n.buy}</span>`;if(n.sell)sum+=`<span class="chip dn">賣 ${n.sell}</span>`;
+  if(n.halt)sum+=`<span class="chip bad">停機 ${n.halt}</span>`;if(n.pause)sum+=`<span class="chip warn">暫停 ${n.pause}</span>`;
+  if(!n.buy&&!n.sell)sum+='<span class="chip mut">今天還沒有買賣</span>';sum+="</div>";
+  el.innerHTML=sum+(dc.length?dc.map(d=>{const k=DCK[d[2]]||["•",""];return`<div class="dc ${esc(d[2])}"><div class="ic">${k[0]}</div><div class="tx"><span class="who">${esc(d[1])}</span><div>${esc(d[3])}</div></div><div class="tm num">${esc(d[0]||"")}</div></div>`}).join(""):'<div class="empty">今天還沒有決定</div>');
+}
+// Shared payload cards; all source strings pass through esc before HTML insertion.
+function payloadCard(id, present, content){
+  $("#"+id+"Card").style.display=present?"":"none";
+  $("#"+id).innerHTML=present?content:"";
+}
+const usageValue=v=>esc(v==null?"無資料":v);
+const dataRow=(k,v)=>`<div class="row"><div class="k">${esc(k)}</div><div class="v">${v}</div></div>`;
+function renderMeme(p){
+  const m=p&&p.mm;
+  payloadCard("meme",!!m,m?dataRow("權益",usageValue(m.eq)+" U")+
+    dataRow("損益 PnL",usageValue(m.pnl)+" U")+dataRow("成交次數",usageValue(m.n))+
+    dataRow("未平倉部位",(m.pos||[]).map(x=>esc(x[0])+"："+usageValue(x[1])+" U").join("<br>")||"目前沒有")+
+    (m.fz?'<div class="chip warn">已凍結</div>':""):"");
+}
+function renderFarmExtras(p){
+  const f=p&&p.ft;
+  payloadCard("farm",Array.isArray(f),f?(f.map(r=>dataRow(r[0],esc(r[1]))).join("")||'<div class="empty">目前沒有回測資料</div>'):"");
+
+}
+function accountUsage(a){
+  const u=a.u;
+  if(!Array.isArray(u)||u.every(v=>v==null))return "無資料";
+  const val=v=>v==null?"無資料":esc(v)+"%";
+  return `Flash 週 ${val(u[0])} · 5 小時 ${val(u[1])}`+(a.ur?` （${esc(a.ur)} 讀取）`:"");
+}
+// ---------- render: compute ----------
+const ST={run:["執行中","blue"],idle:["閒置","mut"],quota:["額度用完","warn"],disabled:["已停用","bad"],reserved:["保留","mut"],mcool:["Claude 冷卻・用 Gemini","blue"]};
+function renderCompute(){
+  const p=C;
+  renderFarmExtras(p);
+  if(!p){$("#cmpPills").innerHTML='<span class="chip mut">還沒有算力資料</span>';["#vm","#accs","#runs","#pend","#res"].forEach(s=>$(s).innerHTML='<div class="empty">—</div>');return}
+  $("#cmpAt").textContent=`資料 ${hm(p.ts)}・${ago(p.ts)}`;
+  const cnt={};(p.accs||[]).forEach(a=>cnt[a.st]=(cnt[a.st]||0)+1);
+  let ph=`<span class="chip ${p.worker?"ok":"bad"}">研究工 ${p.worker?(p.paused?"暫停中":"運作中"):"沒在跑"}</span>`;
+  for(const k of["run","mcool","idle","reserved","quota","disabled"])if(cnt[k])ph+=`<span class="chip ${ST[k][1]}">${ST[k][0]} ${cnt[k]}</span>`;
+  ph+=`<span class="chip mut">排隊 ${p.pend_n??(p.pend||[]).length} 題</span><span class="chip mut">同時最多 ${p.max_par||"—"}</span>`;
+  if(p.alerts)ph+=`<span class="chip warn">未讀警示 ${p.alerts}</span>`;
+  $("#cmpPills").innerHTML=ph;
+  const vm=p.vm;
+  if(vm){$("#vmHead").innerHTML=`雲端主機 <span class="chip ${vm.lv==="ok"?"ok":vm.lv==="bad"?"bad":"warn"}" style="font-size:12px">${esc(vm.head||"")}</span><span class="r">${hm(vm.at)}</span>`;
+    $("#vm").innerHTML=(vm.rows||[]).map(r=>`<div class="row"><div class="k"><span class="dot ${r.l==="ok"?"ok":r.l==="warn"?"warn":r.l==="bad"?"bad":""}"></span>${esc(r.k)}</div><div class="v ${lvC(r.l)}">${esc(r.v)}</div></div>`).join("")+((vm.ev||[]).length?`<div class="row"><div class="k">最近通知</div><div class="v mut">${vm.ev.map(e=>esc(typeof e==="string"?e:(e.t||e.txt||JSON.stringify(e)))).join("；")}</div></div>`:"");}
+  else $("#vm").innerHTML='<div class="empty">沒有主機資料</div>';
+  const LB={};(p.accs||[]).forEach(a=>{if(a.lb)LB[a.n]=a.lb});const AN=n=>`帳號 ${n??"?"}${LB[n]?" · "+esc(LB[n]):""}`;  // 2026-10-27: masked Google account after each 帳號 N
+  $("#accs").innerHTML=(p.accs||[]).map(a=>{const rst=a.rst?hm(a.rst):(a.hit?"約 1 小時後（未知）":"—");
+    return`<div class="acc ${esc(a.st)}"><div class="hd"><b>${AN(a.n)}</b></div><div class="st" style="margin-bottom:8px">${esc(a.txt)}</div>
+    <div class="kv"><span>上次使用</span><span>${a.last?hm(a.last)+" <span class='dim'>"+ago(a.last)+"</span>":"—"}</span><span>已用 %</span><span>${accountUsage(a)}</span><span>上次額度用完</span><span>${a.hit?hm(a.hit):"從未"}</span><span>恢復時間</span><span>${rst}</span><span>今天跑的題數</span><span>${a.today??0}</span></div></div>`}).join("");
+  $("#runs").innerHTML=(p.run&&p.run.length)?p.run.map(r=>{const m=mins(r.started),lim=r.timeout,pc=lim&&m!=null?Math.min(100,m/lim*100):0;
+    return`<div class="task"><div class="hd"><b>${esc(r.slug)}</b><span class="chip blue" style="font-size:12px">${AN(r.acc)}</span>${r.alive===false?'<span class="chip bad" style="font-size:12px">程序已不在</span>':""}</div>
+    ${r.title?`<div class="ds">${esc(r.title)}</div>`:""}<div class="prog ${pc>85?"hot":""}"><i style="width:${pc.toFixed(1)}%"></i></div>
+    <div class="dim num" style="font-size:12.5px;margin-top:5px">已跑 ${m==null?"—":Math.round(m)} 分${lim?` / 上限 ${lim} 分`:""}${r.started?`・開始 ${hm(r.started)}`:""}</div></div>`}).join(""):'<div class="empty">目前沒有</div>';
+  $("#pendN").textContent=`${p.pend_n??0} 題`;
+  $("#pend").innerHTML=(p.pend&&p.pend.length)?p.pend.slice(0,8).map((x,i)=>`<div class="row"><div class="k dim num" style="min-width:24px">${i+1}</div><div class="v"><b style="font-size:13.5px;word-break:break-all">${esc(x.slug)}</b>${x.title?`<div class="mut" style="font-size:12.5px">${esc(x.title)}</div>`:""}</div></div>`).join(""):'<div class="empty">沒有排隊</div>';
+  $("#res").innerHTML=(p.res&&p.res.length)?p.res.slice(0,8).map(x=>{const v=(x.v||"").toLowerCase();const c=/pass|keep|promot|ok|good/.test(v)?"ok":/fail|reject|kill|bad/.test(v)?"bad":"mut";
+    return`<div class="row"><div class="v"><b style="font-size:13.5px;word-break:break-all">${esc(x.slug)}</b> <span class="chip ${c}" style="font-size:11.5px;padding:2px 8px">${esc(x.v||x.r||"—")}</span></div><div class="t">${x.acc?AN(x.acc)+"・":""}${hm(x.fin)}</div></div>`}).join(""):'<div class="empty">—</div>';
+}
+
+// ---------- render: commands ----------
+function renderReplies(){
+  const rp=human.filter(isReply).sort((a,b)=>b.time-a.time).slice(0,8);
+  $("#replies").innerHTML=rp.length?rp.map(m=>`<div class="reply"><div class="ttl"><span>${/錯誤|鎖定|⛔|太頻繁/.test(m.title||"")?"⛔":"✅"}</span><span style="flex:1">${esc(m.title||"回覆")}</span><span class="dim" style="font-weight:500;font-size:12px">${hm(m.time)}</span></div><div class="msg">${esc(m.message||"")}</div></div>`).join(""):'<div class="empty">還沒有指令回覆。按上面的按鈕，回覆會出現在這裡。</div>';
+  $("#pinState").innerHTML=LS.get(K.pin)?'已記在這台裝置 <button class="iconbtn" id="forgetPin" style="height:34px;margin-left:8px">忘記 PIN</button>':'<span class="mut">每次按按鈕時輸入（預設）</span>';
+  const fp=$("#forgetPin");if(fp)fp.onclick=()=>{LS.del(K.pin);sessPin=null;toast("已忘記 PIN");renderReplies()};
+}
+function renderHeader(){
+  const ts=P&&(P.dk&&P.dk.t||P.ts),m=mins(ts);
+  const lv=m==null?"":m>40?"bad":m>20?"warn":"ok";
+  $("#hdDot").className="dot "+lv;
+  $("#hdSub").textContent=ts?`更新 ${hm(ts)}（${ago(ts)}）${P.src==="vm_fallback"?"・雲端自動模式":""}`:"還沒有資料";
+  const st=$("#staleTip");if(m!=null&&m>40){st.style.display="";st.textContent=`⚠️ 資料已經 ${Math.round(m)} 分鐘沒更新，數字可能過時。`}else st.style.display="none";
+}
+// ---------- render: 全部模擬策略 (payload "ab", 2026-10-29) ----------
+// row: [id, type, start U, equity U, open positions, trades, status, as-of MM/DD]; PnL = equity - start
+const AB_TY={m:"主帳戶",g:"網格",s:"子帳戶",o:"觀察倉",f:"農場",mm:"迷因",sh:"影子"};
+const AB_ST={sd:["已停用（10/27 慢策略規則）",""],xo:["只出場","warn"],wd:["等待首日",""],r:["運作中","ok"],ne:["運作中・新進場停用","warn"],p:["暫停","warn"],h:["停機","bad"],x:["停用",""],mv:["停用・資金已併入波段",""],ret:["已退役",""],k:["已出局","bad"],e:["已結束",""],w:["等待開始",""],nd:["無資料",""]};
+const AB_NM={swing:"波段主帳戶（DONCHIAN）",short:"短線帳戶",adx:"ADX",hr_ll:"領漲跟漲",hr_ma:"動能加速",hr_dd:"強勢脫鉤",hr_ps:"拋物線翻多",rb:"區間突破",
+  fbd:"資金費率基差 FBD",rb24:"區間突破 24",ppo236:"PPO 236",c32:"動能加速 32c",cvc:"波動聚集 CVC",meme:"迷因幣","dc2x":"DONCHIAN 2倍影子（觀察用）",
+  "farm:cross_asset_volatility_spread_regime":"跨資產波動價差"};
+const AB_GR={wide:"寬 ±20%",mid:"中 ±10%",narrow:"窄 ±10%（1% 格）",mid_adx:"中 ±10%・ADX 開關"};
+function abName(id){id=String(id??"");if(AB_NM[id])return AB_NM[id];const g=id.match(/^(BTC|ETH|SOL)_(wide|mid|narrow|mid_adx)$/);if(g)return`${g[1]} ${AB_GR[g[2]]}`;
+  return id.startsWith("farm:")?id.slice(5).replace(/_/g," "):id}
+function abHtml(ab){
+  if(!Array.isArray(ab)||!ab.length)return'<div class="empty">還沒有資料（等下一次上傳，最多 15 分鐘）</div>';
+  const now=new Date(),today=`${pad(now.getMonth()+1)}/${pad(now.getDate())}`;
+  let sS=0,sE=0,sP=0,sN=0,nd=0,last=null,body="";
+  for(const r of ab){if(!Array.isArray(r))continue;const[id,ty,st0,eq,pos,n,stc,asof]=r;
+    if(ty!==last){body+=`<tr class="grp"><td colspan="8">${esc(AB_TY[ty]||ty)}</td></tr>`;last=ty}
+    const st=AB_ST[stc]||[String(stc??"—"),""],has=eq!=null&&st0!=null&&stc!=="nd";
+    const pnl=has?eq-st0:null,pp=has&&st0?(eq/st0-1)*100:null;
+    if(has){sS+=Number(st0);sE+=Number(eq);sP+=pnl;}else nd++;
+    if(pos!=null&&stc!=="nd")sN+=Number(pos);
+    const day=asof&&asof!==today?` <span class="dim">${esc(asof)}</span>`:"";
+    body+=`<tr><td>${esc(abName(id))}</td><td class="n num">${has?f2(st0):"—"}</td><td class="n num">${has?f2(eq):"無資料"}</td>
+      <td class="n num ${cls(pnl)}">${pnl==null?"—":sg(pnl)+f2(Math.abs(pnl))}</td><td class="n num ${cls(pp)}">${pp==null?"—":sg(pp)+Math.abs(pp).toFixed(2)+"%"}</td>
+      <td class="n num">${pos==null||stc==="nd"?"—":esc(pos)}</td><td class="n num">${n==null||stc==="nd"?"—":esc(n)}</td><td><span class="abst ${st[1]}">${esc(st[0])}</span>${day}</td></tr>`}
+  const tp=sS?(sE/sS-1)*100:null;
+  body+=`<tr class="tot"><td>合計（${ab.length} 本${nd?`・${nd} 本無資料`:""}）</td><td class="n num">${f2(sS)}</td><td class="n num">${f2(sE)}</td>
+    <td class="n num ${cls(sP)}">${sg(sP)+f2(Math.abs(sP))}</td><td class="n num ${cls(tp)}">${tp==null?"—":sg(tp)+Math.abs(tp).toFixed(2)+"%"}</td><td class="n num">${sN}</td><td></td><td></td></tr>`;
+  return`<div class="abwrap"><table class="ab"><tr><th>名稱</th><th class="n">起始 U</th><th class="n">權益 U</th><th class="n">損益 U</th><th class="n">%</th><th class="n">持倉</th><th class="n">交易</th><th>狀態</th></tr>${body}</table></div>
+    <div class="abnote">全部是紙上模擬，每本是各自獨立的虛擬資金，合計只是加總。網格的持倉數不提供（—），交易數是掛單成交次數。狀態旁的日期＝資料停在那天（不是今天）。</div>`}
+function renderAllBooks(){
+  const src=(P&&Array.isArray(P.ab))?P:((C&&Array.isArray(C.ab))?C:null);
+  const h=abHtml(src&&src.ab),at=src?hm(src.ts):"";
+  $("#ab").innerHTML=h;$("#abAt").textContent=at;
+}
+function renderDsb(){  // 2026-10-29: one line only (user: 就寫說還剩多少就好了)
+  const src=(C&&C.dsb!=null)?C:((P&&P.dsb!=null)?P:null),v=src?Number(src.dsb):NaN;
+  $("#dsb").textContent=isFinite(v)?`DeepSeek 還剩 ${v.toFixed(2)} 元${src.dsc?" "+src.dsc:""}`:"DeepSeek 還剩 —（還沒讀到餘額）";}
+function renderAll(){try{renderDsb()}catch(e){}renderHeader();renderDecisions();renderTrade();renderCompute();renderReplies();try{renderAllBooks()}catch(e){}}
+
+// ---------- refresh loop ----------
+let busy=false;
+async function refresh(manual){
+  if(busy)return;busy=true;$("#refreshBtn").textContent="…";
+  try{await Promise.all([loadData(),loadHuman()]);renderAll();if(manual)toast("已更新")}
+  catch(e){if(manual)toast("連不上 ntfy，稍後再試");renderHeader()}
+  finally{busy=false;$("#refreshBtn").textContent="↻";checkWait()}
+}
+function schedule(){clearTimeout(pollT);const fast=Date.now()<waitUntil;pollT=setTimeout(async()=>{if(!document.hidden)await refresh();schedule()},fast?3000:30000)}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){refresh();schedule()}});
+
+// ---------- commands ----------
+function sheet(html){$("#sheet").innerHTML=html;$("#sheetBg").classList.add("on")}
+function closeSheet(){$("#sheetBg").classList.remove("on");$("#sheet").innerHTML=""}
+$("#sheetBg").addEventListener("click",e=>{if(e.target.id==="sheetBg")closeSheet()});
+function confirmSheet(title,body,okTxt,danger){return new Promise(res=>{sheet(`<h3>${title}</h3><p>${body}</p><div class="two"><button class="wide ghost" id="sNo">取消</button><button class="wide ${danger?"red":"blue"}" id="sYes">${okTxt}</button></div>`);
+  $("#sNo").onclick=()=>{closeSheet();res(false)};$("#sYes").onclick=()=>{closeSheet();res(true)}})}
+function getPin(cmd){
+  const saved=LS.get(K.pin);if(saved)return Promise.resolve(saved);
+  if(sessPin&&Date.now()-sessPinAt<300000)return Promise.resolve(sessPin);
+  return new Promise(res=>{sheet(`<h3>輸入 PIN</h3><p>送出「${esc(cmd)}」需要指令 PIN。PIN 只用在這台裝置，不會上傳到這個網站。</p>
+    <input type="password" id="pinIn" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" placeholder="PIN">
+    <label class="ck"><input type="checkbox" id="pinRem"> 記住在這台${isPC?"電腦":"手機"}</label>
+    <div class="two"><button class="wide ghost" id="pNo">取消</button><button class="wide blue" id="pYes">送出</button></div>`);
+    const inp=$("#pinIn");setTimeout(()=>inp.focus(),80);
+    const ok=()=>{const v=inp.value.trim();if(!v||/\s/.test(v)){inp.style.borderColor="var(--bad)";return}if($("#pinRem").checked)LS.set(K.pin,v);sessPin=v;sessPinAt=Date.now();closeSheet();res(v)};
+    $("#pYes").onclick=ok;inp.onkeydown=e=>{if(e.key==="Enter")ok()};$("#pNo").onclick=()=>{closeSheet();res(null)}})}
+async function publish(cmd,pin,cached){
+  // Cache=no: the text (it holds the PIN) is only delivered to the live listener, not stored on ntfy.sh.
+  const r=await fetch(`${NTFY}/${topic}${cached?"":"?cache=no"}`,{method:"POST",body:`指令 ${pin} ${cmd}`,cache:"no-store"});
+  if(!r.ok)throw new Error(String(r.status));
+}
+async function send(cmd){
+  const pin=await getPin(cmd);if(!pin)return false;
+  try{await publish(cmd,pin,false)}catch(e){toast("送不出去，請檢查網路");return false}
+  lastSent={cmd,at:Date.now()/1000};waitSince=Date.now()/1000-5;waitUntil=Date.now()+60000;
+  $("#waitTxt").textContent=`等待「${cmd}」回覆…`;toast(`已送出「${cmd}」，等待回覆…`);schedule();setTimeout(()=>refresh(),2500);return true;
+}
+function checkWait(){
+  if(!waitSince)return;
+  const got=human.filter(m=>isReply(m)&&m.time>=waitSince).sort((a,b)=>b.time-a.time)[0];
+  if(got){waitSince=0;waitUntil=0;$("#waitTxt").textContent="";toast(`${got.title}`);if(/PIN 錯誤|鎖定/.test(got.title||"")){LS.del(K.pin);sessPin=null;renderReplies()}return}
+  if(Date.now()>waitUntil){const c=lastSent&&lastSent.cmd;waitSince=0;$("#waitTxt").innerHTML="";
+    sheet(`<h3>沒收到回覆</h3><p>60 秒內沒有收到「${esc(c)}」的回覆。可能是雲端主機的指令程式正在重新連線。要再送一次嗎？（這次會在 ntfy 暫存最多 12 小時，確保送達）</p><div class="two"><button class="wide ghost" id="sNo">先不要</button><button class="wide blue" id="sYes">再送一次</button></div>`);
+    $("#sNo").onclick=closeSheet;$("#sYes").onclick=async()=>{closeSheet();const pin=await getPin(c);if(!pin)return;try{await publish(c,pin,true);waitSince=Date.now()/1000-5;waitUntil=Date.now()+60000;$("#waitTxt").textContent=`等待「${c}」回覆…`;schedule();toast("已重送")}catch(e){toast("送不出去")}}}
+}
+$$(".bigbtn").forEach(b=>b.onclick=async()=>{
+  const c=b.dataset.cmd;
+  if(c==="全部平倉"){if(!await confirmSheet("全部平倉？","會把所有紙上持倉平掉並暫停開新倉。送出後還要在 5 分鐘內按「確認平倉」才會執行。","送出全部平倉",true))return;
+    if(await send("全部平倉")){LS.set(K.close,String(Date.now()+300000));tickClose()}return}
+  if(c==="暫停"&&!await confirmSheet("暫停開新倉？","所有帳本停止開新倉，出場和停損照常。之後可以按「恢復」。","暫停",false))return;
+  await send(c);
+});
+$("#confirmClose").onclick=async()=>{if(!await confirmSheet("最後確認：全部平倉","紙上帳本會立刻平掉所有持倉。確定嗎？","確認平倉",true))return;if(await send("確認平倉")){LS.del(K.close);tickClose()}};
+let closeT=null;
+function tickClose(){clearTimeout(closeT);const u=+LS.get(K.close)||0,left=u-Date.now();const bar=$("#confirmBar");
+  if(left<=0){bar.classList.remove("on");if(u)LS.del(K.close);return}
+  bar.classList.add("on");const s=Math.ceil(left/1000);$("#cdTxt").textContent=`${Math.floor(s/60)}:${pad(s%60)}`;closeT=setTimeout(tickClose,500)}
+
+// ---------- misc UI ----------
+let toastT=null;function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("on"),2600)}
+function setTab(t){$$("nav.tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));$$(".tab").forEach(s=>s.classList.toggle("on",s.id==="tab-"+t));LS.set("cd_tab",t);scrollTo({top:0})}
+$$("nav.tabs button").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+function setColor(c){document.documentElement.classList.toggle("redup",c==="r");LS.set(K.col,c);$$("#colorSeg button").forEach(b=>b.classList.toggle("on",b.dataset.c===c))}
+$$("#colorSeg button").forEach(b=>b.onclick=()=>{setColor(b.dataset.c);renderAll()});
+$("#refreshBtn").onclick=()=>refresh(true);
+$("#resetBtn").onclick=async()=>{if(!await confirmSheet("清除設定？","會清掉這台裝置記住的通行碼、PIN 和暫存資料。之後要重新掃 QR 碼設定。","清除",true))return;Object.values(K).forEach(k=>LS.del(k));location.replace(location.pathname)};
+$("#topicSave").onclick=()=>{const t=parseTopic($("#topicIn").value);if(!t){toast("看不懂，請貼上完整的設定連結");return}LS.set(K.t,t);$("#topicIn").value="";start()};
+
+async function start(){
+  readFragment();if(isPC)document.title="算力小工具・交易看板";topic=LS.get(K.t);
+  if(!topic){$("#setup").style.display="";$("#app").style.display="none";return}
+  $("#setup").style.display="none";$("#app").style.display="";
+  if(!isPC&&!standalone()&&/iPhone|iPad/.test(navigator.userAgent))$("#installTip").style.display="";
+  dataTopic=await hmacTopic(topic);
+  try{P=JSON.parse(LS.get(K.pay)||"null");C=JSON.parse(LS.get(K.cmp)||"null")}catch(e){}
+  renderAll();tickClose();await refresh();schedule();
+}
+setColor(LS.get(K.col)||"g");setTab(new URLSearchParams(location.hash.slice(1)).get("tab")||LS.get("cd_tab")||"trade");
+if("serviceWorker"in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+start();
+</script>
+</body>
+</html>
