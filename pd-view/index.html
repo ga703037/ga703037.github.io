@@ -320,6 +320,12 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
  .seg button{min-width:72px}
 }
 @media(prefers-reduced-motion:reduce){.tab.on,.sheet-bg.on,.toast.on{animation:none}.bigbtn{transition:none}}
+
+/* 排行與競技場 */
+#tab-rank,#tab-arena{font-size:12px}.db-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}.db-card,.db-panel{background:var(--card,#171e26);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}.db-card strong{font-size:22px;display:block;margin:6px 0}.db-muted{color:var(--muted,#8b9eb4)}.db-warn{color:#e9a23c}.db-scroll{overflow:auto;margin-top:12px}.db-table{width:100%;border-collapse:collapse;font-size:11px}.db-table th,.db-table td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}.db-table th{background:#202a36;color:#90a5bc}.db-table tbody tr:hover{background:#223d60;cursor:pointer}.db-table .db-why{max-width:150px;overflow:hidden;text-overflow:ellipsis}.db-table .db-name{white-space:normal;min-width:95px}.db-stopped{opacity:.48}.db-medal{display:inline-flex;width:23px;height:23px;align-items:center;justify-content:center;border-radius:50%;background:#e7af37;color:#111}.db-medal.m2{background:#c0cad5}.db-medal.m3{background:#bd7b42}.db-stale{display:inline-block;color:#efaa42;border:1px solid #80541f;border-radius:5px;padding:1px 3px}.db-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.db-panel h3{font-size:14px;margin:0 0 10px}#db-detail{margin-top:16px;line-height:1.9}.db-tx{padding:4px 0;border-bottom:1px solid var(--line)}.db-chart{width:100%;height:170px}.db-quote{text-align:right;color:#47be82}.db-note{margin:7px 0}body:has(#tab-rank.on),body:has(#tab-arena.on){max-width:none}body:has(#tab-rank.on) main,body:has(#tab-arena.on) main{max-width:1800px;margin:auto}.db-table td:first-child{position:sticky;left:0;background:var(--card,#171e26);z-index:1}
+@media(max-width:650px){.db-cards{grid-template-columns:1fr 1fr}.db-layout{grid-template-columns:1fr}.db-card{padding:10px}.db-card strong{font-size:18px}#tab-rank .db-table{min-width:1250px}nav.tabs button{padding:9px 2px;font-size:11px}.db-quote{font-size:10px}}
+.db-scroll{max-height:70vh}.db-table th{position:sticky;top:0;z-index:3;color:#d9e5f3}.db-table td:nth-child(2){position:sticky;left:40px;background:#171e26;z-index:1}.db-table td:first-child{min-width:28px}.db-table th:first-child{left:0;z-index:4}.db-table th:nth-child(2){left:40px;z-index:4}.db-filters{display:flex;gap:10px;margin:14px 0}.db-filters input,.db-filters select{max-width:240px;padding:9px;background:#202a36;color:#edf3fa;border:1px solid #52667b;border-radius:7px}#tab-arena{color:#e5edf7}#tab-arena .db-muted,#tab-arena small{color:#b9c9da}.db-card strong{color:#f3f7ff}
+.db-notes-bar{margin:10px 0;padding:8px 10px;border:1px solid #80541f;border-radius:8px;background:#2a2113;color:#f1c27a;line-height:1.6}.db-acc{display:inline-block;color:#9fc3ff;border:1px solid #3d5f8f;border-radius:5px;padding:1px 4px;font-size:10px}.db-off{color:#8b9eb4;font-size:10px}.db-accrow td{color:#c3d0de}.db-table .db-nt{white-space:normal;min-width:160px;max-width:240px;font-size:10px;color:#f1c27a}.db-day{margin-top:12px}.db-day-h{font-weight:600;color:#f3f7ff}#db-days .db-table td,#db-slots .db-table td{position:static}.db-card strong{overflow-wrap:anywhere;font-size:clamp(14px,1.6vw,22px)}.db-filters>*{flex:1 1 0;min-width:0}
 </style>
 </head>
 <body>
@@ -344,6 +350,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 </header>
 <nav class="tabs">
   <button data-tab="trade" class="on"><span class="i">📈</span>交易</button>
+  <button data-tab="rank"><span class="i">🏆</span>排行</button>
+  <button data-tab="arena"><span class="i">🐎</span>競技場</button>
   <button data-tab="compute"><span class="i">🧠</span>算力</button>
   <button data-tab="cmd" class="brk"><span class="i">🛑</span>緊急煞車</button>
 </nav>
@@ -351,6 +359,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
   <div id="installTip" class="banner" style="display:none">要像 App 一樣用：按 Safari 下方的「分享」⬆️ →「加入主畫面」。之後從主畫面的圖示打開。</div>
   <div id="staleTip" class="banner stale" style="display:none"></div>
 
+  <section class="tab" id="tab-rank"></section>
+  <section class="tab" id="tab-arena"></section>
   <section class="tab on" id="tab-trade">
     <div class="grid g2">
       <div class="card hero span2">
@@ -438,7 +448,7 @@ const pad=n=>String(n).padStart(2,"0");
 function hm(d){d=pt(d);if(!d)return"—";const n=new Date();const same=d.toDateString()===n.toDateString();return(same?"":`${d.getMonth()+1}/${d.getDate()} `)+`${pad(d.getHours())}:${pad(d.getMinutes())}`}
 function ago(d){d=pt(d);if(!d)return"";const m=Math.round((Date.now()-d)/60000);if(m<1)return"剛剛";if(m<60)return`${m} 分前`;const h=Math.floor(m/60);if(h<24)return`${h} 小時前`;return`${Math.floor(h/24)} 天前`}
 function mins(d){d=pt(d);return d?Math.max(0,(Date.now()-d)/60000):null}
-const f2=v=>v==null||isNaN(v)?"—":Number(v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const f2=v=>v==null||isNaN(v)?"—":Number(v).toLocaleString("en-US",{minimumFractionDigits:2,minimumFractionDigits:2,maximumFractionDigits:2});
 const sg=v=>v>0?"+":v<0?"−":"";
 const cls=v=>v>0.0001?"up":v<-0.0001?"dn":"mut";
 function fpx(v){if(v==null)return"—";v=Number(v);return v>=1000?v.toLocaleString("en-US",{maximumFractionDigits:1}):v>=1?v.toFixed(3):v.toPrecision(4)}
@@ -682,13 +692,84 @@ function renderAllBooks(){
 function renderDsb(){  // 2026-10-29: one line only (user: 就寫說還剩多少就好了)
   const src=(C&&C.dsb!=null)?C:((P&&P.dsb!=null)?P:null),v=src?Number(src.dsb):NaN;
   $("#dsb").textContent=isFinite(v)?`DeepSeek 還剩 ${v.toFixed(2)} 元${src.dsc?" "+src.dsc:""}`:"DeepSeek 還剩 —（還沒讀到餘額）";}
-function renderAll(){try{renderDsb()}catch(e){}renderHeader();renderDecisions();renderTrade();renderCompute();renderReplies();try{renderAllBooks()}catch(e){}}
+function renderAll(){try{renderDsb()}catch(e){}renderHeader();renderDecisions();renderTrade();renderCompute();renderReplies();try{renderAllBooks()}catch(e){}renderDashBooks()}
+
+const DB_WHY = {"swing": "價格突破唐奇安通道才進場，依波段出場規則持有。", "short": "一小時 RSI 回升，且四小時價格高於長期均線才進場。", "adx": "只觀察比特幣，以 ADX 趨勢強度決定進出。", "hr_ll": "先觀察領漲幣，再找落後且開始跟漲的幣。", "hr_ma": "找價格動能正在加速的幣，依風險規則限制部位。", "hr_dd": "找相對大盤強勢、走勢開始脫鉤的幣。", "hr_ps": "拋物線指標翻多後進場，翻空或風險條件觸發時退出。", "rb": "價格突破近期區間上緣才進場。", "fbd": "根據資金費率與現貨期貨基差尋找訊號。", "rb24": "以二十四日區間突破訊號選幣。", "ppo236": "以快慢均線百分比振盪訊號觀察動能。", "c32": "觀察三十二日動能加速訊號。", "cvc": "觀察波動聚集後的策略訊號。", "v9270": "每四小時觀察成交量高潮訊號。", "meme": "迷因幣突破前二十四根高點，且成交量超過歷史中位數門檻。", "grid": "固定幣種與網格區間，低買高賣；部分版本有 ADX 開關。", "farm": "依已登記候選策略的封存訊號或權重運行。", "dc2x": "兩倍槓桿唐奇安通道影子研究，不影響主帳。", "observe": "依獨立觀察策略的已收盤訊號選幣。"};
+const dbNum=(v,suffix='')=>v==null?'—':Number(v).toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:2})+suffix;
+const dbPct=b=>b&&b.eq!=null&&b.start?(b.eq/b.start-1)*100:null;
+const dbSign=v=>v==null?'—':(v>=0?'+':'')+dbNum(v);
+const dbStopped=b=>['sd','h','x','mv','ret','k','e','frozen','diverged'].includes(b.st);
+const dbStatus=b=>b.st==='nd'?'無資料':dbStopped(b)?'已停止':b.hold.length?'持有 '+b.hold.join('／'):'空手';
+const dbWhy=b=>b.why||DB_WHY[b.id]||DB_WHY[b.id.startsWith('farm:')?'farm':b.id.match(/^(BTC|ETH|SOL)_/)?'grid':'observe'];
+const dbTime=t=>t?new Date(t).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}):'—';
+function dbTable(headers,rows){return `<div class="db-scroll"><table class="db-table"><thead><tr>${headers.map(x=>`<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(x=>`<td>${esc(x??'—')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
+function dbCard(label,value,note=''){return `<div class="db-card"><span class="db-muted">${esc(label)}</span><strong>${esc(value)}</strong><small>${esc(note)}</small></div>`}
+const DB_REASON = {"days_lt_3": "上線未滿 3 天", "trades_lt_10": "交易未滿 10 筆", "new_gen_pending": "新世代待上線", "cull_bottom_10pct": "每日末位 10% 淘汰", "ret_le_-40": "自本金虧損達 40%", "liquidated": "爆倉", "zero_trades_14d": "上線 14 天仍 0 筆交易", "vacant_no_parent": "無合格母體，空位", "boost_top3": "前 3 名加碼至 50U", "stale_skip": "過半資料過舊，本輪不淘汰", "ledger_eliminated": "帳本已停止", "replaced_by_gen": "由新世代取代", "phase_1b_pending": "Phase 1B 尚未實作", "family_not_implemented": "策略族尚未實作", "settle": "結算淘汰", "eliminated_by_settle": "結算淘汰平倉", "hard_stop": "硬停損平倉"};
+const dbReason=c=>c?String(c).split(';').filter(Boolean).map(x=>{if(DB_REASON[x])return DB_REASON[x];let m=x.match(/^replaced_by_gen(\d+)$/);if(m)return DB_REASON.replaced_by_gen+'（第 '+m[1]+' 代）';m=x.match(/^ledger_eliminated:(.+)$/);if(m)return DB_REASON.ledger_eliminated+'（'+(DB_REASON[m[1]]||m[1])+'）';return x}).join('；'):'—';
+const dbSlot=(id,g)=>String(id).split(':').pop()+(g!=null?' g'+g:'');
+const dbMin=a=>a&&a.min||[3,10];
+const dbAccTip=(b,a)=>`交易 ${b.ntr==null?'—':Math.round(b.ntr)}/${dbMin(a)[1]} 筆・上線 ${b.days==null?'—':Math.floor(b.days)}/${dbMin(a)[0]} 天`;
+const dbRanked=b=>!dbStopped(b)&&b.rk!=='acc'&&b.rk!=='off'&&dbPct(b)!=null;
+const dbGroup=b=>dbStopped(b)?4:b.rk==='off'?3:b.rk==='acc'?1:dbPct(b)==null?2:0;
+const dbNotes=(b,t)=>b.notes||(b.nt||[]).map(i=>t.notes&&t.notes[i]?t.notes[i][0]:'').filter(Boolean);
+const dbNotesBar=t=>t.notes&&t.notes.length?`<div class="db-notes-bar" id="db-notes-bar">⚠ 備註：${t.notes.map(n=>`<b>${esc(n[0])}</b>（${esc(n[1])} 組）`).join('；')}</div>`:'';
+const dbRkLabel=(b,a)=>b.rk==='acc'?`<span class="db-acc" title="${esc(dbAccTip(b,a))}">累積中</span>`:b.rk==='off'?'<span class="db-off">未參賽</span>':'—';
+function dbRefill(f){return f?`g${f[0]} 複製自 ${dbSlot(f[1],f[2])}（第 ${f[3]??'—'} 名 ${dbSign(f[4])}%）${f[5]?'・'+f[5]:''}`:'空位（無合格母體）'}
+function dbDays(a){
+ if(!a.days||!a.days.length)return '';
+ return '<div class="db-panel" id="db-days"><h3>每日淘汰與補位（台北 08:05 結算）</h3><small>ⓘ 淘汰原因與補位來源取自 arena/settlements.jsonl；「複製自」為母體組別、世代、當時名次與報酬</small>'+[...a.days].reverse().map(d=>{
+  const rows=[...d.out.map(o=>['淘汰',dbSlot(o[0],o[1]),dbReason(o[2]),dbSign(o[3])+'%',o[4]??'—',o[5]??'—',o[6]==null?'—':Math.floor(o[6]),dbRefill(o[7])]),...d.new_only.map(n=>['補位',dbSlot(n[0],n[1]),'先前空位','—','—','—','—',`g${n[1]} 複製自 ${dbSlot(n[2])}`]),...d.promo.map(p=>['加碼',dbSlot(p[0],p[2]),dbReason('boost_top3'),'—',p[1]??'—','—','—','—'])];
+  return `<div class="db-day"><div class="db-day-h">${esc(d.date)}・第 ${esc(d.round??'—')} 輪・排名 ${esc(d.ranked)}/${esc(d.n)} 組${d.stale_skip?'<span class="db-warn">・資料過舊，本輪不淘汰</span>':''}</div>`+(rows.length?dbTable(['結果','組別','原因','報酬','名次','交易筆數','上線天數','補位來源'],rows):'<div class="db-muted db-note">本輪無淘汰、無補位</div>')+'</div>'}).join('')+'</div>';
+}
+function dbSlots(books,a){
+ const gs=books.filter(b=>b.gen!=null);if(!gs.length)return '';
+ const last=new Map((a.records||[]).map(r=>[r[0],r]));
+ const act={keep:'保留',eliminated:'淘汰',new:'新生',promoted:'加碼'};
+ return '<div class="db-panel" id="db-slots"><h3>各組世代與資金</h3><small>ⓘ 本金含加碼；累積中＝交易未滿 '+esc(dbMin(a)[1])+' 筆或上線未滿 '+esc(dbMin(a)[0])+' 天，不排名也不淘汰</small>'+dbTable(['組別','策略','世代','本金','加碼','現在價值','賺賠%','上線天數','交易筆數','排名狀態','上次結算'],[...gs].sort((x,y)=>x.id<y.id?-1:1).map(b=>{const r=last.get(b.id);return [dbSlot(b.id),b.name,'g'+b.gen,dbNum(b.cap),b.adds?'+'+dbNum(b.adds):'—',dbNum(b.eq),dbSign(dbPct(b))+'%',b.days==null?'—':Math.floor(b.days),b.ntr==null?'—':Math.round(b.ntr),b.rk==='acc'?'累積中（'+dbAccTip(b,a)+'）':b.rk==='off'?'未參賽':dbStopped(b)?'已停止':'排名中',r?`${act[r[1]]||r[1]}${r[2]?'・第 '+r[2]+' 名':''}${r[3]?'・'+dbReason(r[3]):''}`:'—']}))+'</div>';
+}
+function renderDashBooks(){
+ const db=DB,src=db;
+ if(!db){for(const id of ['rank','arena'])$('#tab-'+id).innerHTML='<div class="db-panel">排行資料尚未送達<p>請到交易頁查看「全部模擬策略」。</p></div>';return}
+ const books=db.b||db.books||[], t=db.tot,a=db.ar,byid=id=>books.find(b=>b.id===id),first=byid(t.first),last=byid(t.last);
+ const quote=src.dk&&src.dk.pxok!==false&&src.dk.bk&&src.dk.bk.some(b=>b[2]!=null)?'即時行情 data-api.binance.vision':'成本價估值';
+ const clock=src.ts?new Date(typeof src.ts==='number'?src.ts*1000:src.ts).toLocaleTimeString('zh-TW',{timeZone:'Asia/Taipei',hour:'2-digit',minute:'2-digit',hour12:false}):'—';
+ const extra=(t.acc?`・累積中 ${t.acc} 組不排名`:'')+(t.off?`・未參賽 ${t.off} 組`:'');
+ let h=`<div class="db-quote">${esc(quote)}｜排行資料 ${esc(clock)}（每 30 分更新）${Date.now()-new Date(db.ts).getTime()>5400000?'<span class="db-warn">・排行資料已超過 90 分未更新</span>':''}</div>`+dbNotesBar(t)+'<div class="db-cards">'+dbCard('參賽策略',`${t.n} 組`,`本金合計 ${dbNum(t.total_start)} USDT${extra}`)+dbCard('賺錢／賠錢／持平',`賺 ${t.win} 賠 ${t.lose} 平 ${t.flat}`,'±0.01% 算平')+dbCard('第一名',(first?first.name:'—')+' '+dbSign(dbPct(first))+'%')+dbCard('最後一名',(last?last.name:'—')+' '+dbSign(dbPct(last))+'%')+'</div>';
+ h+=`<div class="db-note">${esc(t.n)} 組合計 ${esc(dbNum(t.total_eq))} USDT（${esc(dbSign(t.total_start?(t.total_eq/t.total_start-1)*100:null))}%）・今天合計 ${esc(dbSign(t.total_td))} USDT（${esc(t.n_td_missing)} 組無今日資料）</div>`+(a.evo?`<div class="db-warn db-note">下次進化結算 ${esc(dbTime(a.next_settle))}・交易未滿 ${esc(dbMin(a)[1])} 筆或上線未滿 ${esc(dbMin(a)[0])} 天標「累積中」不排名・看板只顯示紀錄</div>`:`<div class="db-warn db-note">下次每日彙總 ${esc(dbTime(a.next_settle))}・本桌只有固定自動停止規則，彙總不淘汰</div>`)+'<div class="db-muted">金額都已含手續費（扣除後）</div>';
+ const sorted=[...books].sort((x,y)=>dbGroup(x)-dbGroup(y)||(dbPct(y)??-Infinity)-(dbPct(x)??-Infinity));
+ h+=`<div class="db-filters"><input id="db-search" placeholder="搜尋策略" aria-label="搜尋策略"><select id="db-theory" aria-label="理論"><option value="">全部理論</option>${[...new Set(books.map(b=>b.fam))].map(f=>`<option value="${esc(f)}">${esc(f)}</option>`).join('')}</select></div>`;
+ h+='<div class="db-scroll"><table class="db-table" id="db-rank-table"><thead><tr>'+['名次','策略（白話）','選幣方法','幣種','本金','現在價值','賺賠金額','賺賠%','今天賺賠','狀態','為什麼選這個幣','交易次數','世代','備註'].map(x=>`<th>${esc(x)}</th>`).join('')+'</tr></thead><tbody>';
+ let k=0;sorted.forEach(b=>{const pnl=b.eq!=null&&b.start!=null?b.eq-b.start:null,pp=dbPct(b),rk=dbRanked(b)?++k:0,ns=dbNotes(b,t);h+=`<tr data-book="${esc(b.id)}" class="${dbStopped(b)||b.rk==='off'?'db-stopped':''}${b.rk==='acc'?' db-accrow':''}"><td>${rk?(rk<=3?`<span class="db-medal m${rk}">${rk}</span>`:rk):dbRkLabel(b,a)}</td><td class="db-name">${esc(b.name)} ${b.stale?`<span class="db-stale" title="${esc(b.asof||'無資料時間')}">過期 ${esc(b.age_min==null?'—':Math.round(b.age_min/60))} 時</span>`:''}${b.err?`<span class="db-stale" title="${esc(b.err)}">錯誤</span>`:''}</td><td class="db-why" title="${esc(b.how)}">${esc(b.how)}</td><td>${esc(b.syms.join('／')||'—')}</td><td>${esc(dbNum(b.start))}</td><td>${esc(dbNum(b.eq))}</td><td class="${cls(pnl)}">${esc(dbSign(pnl))}</td><td class="${cls(pp)}">${esc(dbSign(pp))}%</td><td class="${cls(b.td)}">${esc(dbSign(b.td))}</td><td>${esc(dbStatus(b))}</td><td class="db-why" title="${esc(dbWhy(b))}">${esc(dbWhy(b))}</td><td>${esc(b.ntr==null?'—':Math.round(b.ntr))}</td><td>${esc(b.gen==null?'—':'g'+b.gen)}</td><td class="db-nt">${esc(ns.join('；')||'—')}</td></tr>`});
+ h+='</tbody></table></div><div id="db-detail" class="db-panel" hidden></div>';$('#tab-rank').innerHTML=h;
+ $('#db-rank-table').onclick=e=>{const r=e.target.closest('tr[data-book]');if(!r)return;const b=byid(r.dataset.book),el=$('#db-detail'),ns=dbNotes(b,t);el.hidden=false;el.innerHTML=`<h3>${esc(b.name)}｜${esc(dbStatus(b))}｜現值 ${esc(dbNum(b.eq))} USDT（${esc(dbSign(b.eq!=null&&b.start!=null?b.eq-b.start:null))}, ${esc(dbSign(dbPct(b)))}%）</h3>${b.gen!=null?`<div>組別 ${esc(dbSlot(b.id,b.gen))}・本金 ${esc(dbNum(b.cap))} USDT${b.adds?`（含加碼 ${esc(dbNum(b.adds))}）`:''}・上線 ${esc(b.days==null?'—':dbNum(b.days))} 天・累計交易 ${esc(b.ntr==null?'—':Math.round(b.ntr))} 筆・${b.rk==='acc'?'累積中（'+esc(dbAccTip(b,a))+'），不排名':b.rk==='off'?'未參賽':'排名中'}</div>`:''}${ns.length?`<div class="db-notes-bar">備註：${esc(ns.join('；'))}</div>`:''}${b.err?`<div class="db-warn">最近一次執行錯誤：${esc(b.err)}</div>`:''}${b.out&&b.out[0]?`<div class="db-warn">停止原因：${esc(dbReason(b.out[1]))}（${esc(dbTime(b.out[0]))}）</div>`:''}<div>持倉：${b.pos.length?b.pos.map(p=>esc(p.length===2?`${p[0]} 市值 ${dbNum(p[1])}`:`${p[0]} 數量 ${dbNum(p[1])}、成本 ${dbNum(p[2])}、市值 ${dbNum(p[4])}`)).join('；'):'空手'}；現金 ${esc(dbNum(b.cash))} USDT</div><div>選幣理由：${esc(dbWhy(b))}</div><div class="db-muted">每一筆買賣（新的在上面，金額都是虛擬 USDT）</div>${b.tr&&b.tr.length?b.tr.map(tr=>`<div class="db-tx ${tr[1]==='買'?cls(1):cls(-1)}">${esc(tr[0])} ${esc(tr[1]==='買'?'用':'收到')} ${esc(dbNum(tr[5]))} USDT ${esc(tr[1]==='買'?'買入':'賣出')} ${esc(tr[2])} @${esc(dbNum(tr[4]))}（${esc(tr[1]==='買'?'買到':'賣出')} ${esc(dbNum(tr[3]))} ${esc(tr[2])}）</div>`).join(''):'—（此帳本未提供明細）'}`;};
+ const fam=a.fams.find(f=>f[0]===a.best_theory),champ=a.hof[0];
+ const filter=()=>{$$('#db-rank-table tbody tr').forEach(r=>{const b=byid(r.dataset.book);r.hidden=!((b.name+' '+b.id).toLowerCase().includes($('#db-search').value.toLowerCase())&&(!$('#db-theory').value||b.fam===$('#db-theory').value))})};$('#db-search').oninput=filter;$('#db-theory').onchange=filter;
+ const arCards='<div class="db-cards">'+dbCard('世代／輪數',`${a.evo?'最高':''}世代 ${a.gen??'—'} ・第 ${a.round??'—'} 輪`,'ⓘ '+a.round_def)+dbCard(a.evo?'下次進化結算':'下次每日彙總',dbTime(a.next_settle),'ⓘ '+a.settle_def)+dbCard('目前最強理論',fam?fam[1]:'—','ⓘ 參賽成員平均報酬最高')+dbCard('名人堂第一',champ?champ[1]:'—',champ?dbSign(champ[2])+'%':'—')+'</div>';
+ const act={promoted:'加碼',eliminated:'淘汰',new:'新生',keep:'保留'};
+ let ar='<div class="db-panel"><h3>'+(a.evo?'進化規則與既有停止規則':'既有固定自動停止規則')+'</h3><p>看板僅顯示紀錄，不執行淘汰與繁殖</p>'+a.rules.map(r=>`<div class="db-note">${esc(r)}</div>`).join('')+'</div>'+dbDays(a)+dbSlots(books,a)+'<div class="db-layout"><div class="db-panel"><h3>最近一次'+(a.evo?'結算':'彙總')+'（保留／停止／新加入）</h3><small>ⓘ '+(a.evo?'採最新一批結算紀錄':'推導採最近 21:00 往前 24 小時')+'</small>'+dbTable(['結果','策略','時間','原因'],[...a.last.keep.map(id=>['保留',byid(id)?.name||id,'—','—']),...a.last.out.map(r=>['停止',byid(r[0])?.name||r[0],dbTime(r[1]),dbReason(r[2])]),...a.last.new.map(id=>['新加入',byid(id)?.name||id,'—','—'])])+'</div><div class="db-panel"><h3>理論排行：哪一套理論最強</h3><small>ⓘ 依目前參賽成員報酬平均排列</small>'+dbTable(['理論','成員數','平均','中位數','最佳','最佳成員'],a.fams.map(f=>[f[1],f[2],dbSign(f[3])+'%',dbSign(f[4])+'%',dbSign(f[6])+'%',byid(f[5])?.name||f[5]]))+'</div><div class="db-panel"><h3>每日結算歷史：最佳／中位數／平均 報酬</h3><small>ⓘ '+(a.evo?'結算紀錄按輪彙總，只計有名次的組':'推導模式採台北日最後快照')+'</small>'+dbChart(a.hist)+dbTable(['日期','最佳','中位數','平均','本數'],a.hist.map(r=>[r[0],...r.slice(1,4).map(v=>dbSign(v)+'%'),r[4]]))+'</div><div class="db-panel"><h3>名人堂（歷來最強，含已停止）</h3><small>ⓘ 結算紀錄的名次報酬或快照最高點；未記錄日期顯示 —</small>'+dbTable(['策略','最高報酬','日期','狀態'],a.hof.map(r=>[r[1],dbSign(r[2])+'%',r[3],r[4]?'仍在跑':'已停止']))+'</div></div>';
+ ar=arCards+dbNotesBar(t)+`<div class="db-note">來源：${esc(a.source)} ${a.settlement_file?'': '—（尚無結算紀錄檔）'}${a.bad_lines?`<span class="db-warn">・${esc(a.bad_lines)} 行無法讀取已略過</span>`:''}</div>`+(a.settlement_file&&a.records&&a.records.length?'<div class="db-panel"><h3>最近一次結算明細</h3>'+dbTable(['結果','組別','名次','報酬','原因','本金','交易筆數','上線天數'],a.records.map(r=>[act[r[1]]||r[1],dbSlot(r[0],r[4])+(byid(r[0])?' '+byid(r[0]).name:''),r[2]??'—',dbSign(r[5])+'%',dbReason(r[3]),dbNum(r[6]),r[7]??'—',r[8]==null?'—':Math.floor(r[8])]))+'</div>':'')+ar;
+ $('#tab-arena').innerHTML=ar;
+}
+function dbChart(hist){if(!hist.length)return '<p>—</p>';const vals=hist.flatMap(r=>r.slice(1,4)),lo=Math.min(...vals),hi=Math.max(...vals),span=hi-lo||1,colors=['#eab24b','#55c99f','#6faaff'];return '<svg class="db-chart" viewBox="0 0 500 170" role="img" aria-label="最佳、中位數、平均報酬折線">'+[1,2,3].map((k,i)=>`<polyline fill="none" stroke="${colors[i]}" stroke-width="2" points="${hist.map((r,j)=>`${20+j*460/Math.max(1,hist.length-1)},${140-(r[k]-lo)*110/span}`).join(' ')}"/><text x="${20+i*140}" y="165" fill="${colors[i]}">${['最佳','中位數','平均'][i]}</text>`).join('')+'</svg>'}
 
 // ---------- refresh loop ----------
+let DB=null,dbLast=0,dbLoading=false;
+async function loadDB(){
+ if(!dataTopic||!document.querySelector('#tab-rank.on,#tab-arena.on'))return;
+ const key='cd_db_'+dataTopic;
+ if(!DB){try{DB=JSON.parse(localStorage.getItem(key))}catch(e){}}
+ if(dbLoading||Date.now()-dbLast<120000)return;
+ dbLast=Date.now();dbLoading=true;
+ try{const msgs=(await poll(dataTopic+'-db','24h')).filter(m=>m.event==='message').sort((a,b)=>b.time-a.time);
+ for(const m of msgs){let d=null;try{d=await decode(m.message)}catch(e){}
+ if((!d||typeof d!=='object')&&m.attachment?.url){const r=await fetch(m.attachment.url,{cache:'no-store'});if(r.ok)d=await decode(await r.text())}
+ if(d&&(d.b||d.books)){DB=d;try{localStorage.setItem(key,JSON.stringify(d))}catch(e){}break}}
+ }finally{dbLoading=false}
+}
 let busy=false;
 async function refresh(manual){
   if(busy)return;busy=true;$("#refreshBtn").textContent="…";
-  try{await Promise.all([loadData(),loadHuman()]);renderAll();if(manual)toast("已更新")}
+  try{await Promise.all([loadData(),loadHuman(),loadDB()]);renderAll();if(manual)toast("已更新")}
   catch(e){if(manual)toast("連不上 ntfy，稍後再試");renderHeader()}
   finally{busy=false;$("#refreshBtn").textContent="↻";checkWait()}
 }
@@ -745,7 +826,7 @@ function tickClose(){clearTimeout(closeT);const u=+LS.get(K.close)||0,left=u-Dat
 
 // ---------- misc UI ----------
 let toastT=null;function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("on"),2600)}
-function setTab(t){$$("nav.tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));$$(".tab").forEach(s=>s.classList.toggle("on",s.id==="tab-"+t));LS.set("cd_tab",t);scrollTo({top:0})}
+function setTab(t){$$("nav.tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));$$(".tab").forEach(s=>s.classList.toggle("on",s.id==="tab-"+t));LS.set("cd_tab",t);loadDB().then(renderDashBooks).catch(()=>{});scrollTo({top:0})}
 $$("nav.tabs button").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 function setColor(c){document.documentElement.classList.toggle("redup",c==="r");LS.set(K.col,c);$$("#colorSeg button").forEach(b=>b.classList.toggle("on",b.dataset.c===c))}
 $$("#colorSeg button").forEach(b=>b.onclick=()=>{setColor(b.dataset.c);renderAll()});
