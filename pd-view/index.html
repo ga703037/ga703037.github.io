@@ -324,7 +324,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 /* 排行與競技場 */
 #tab-rank,#tab-arena{font-size:12px}.db-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}.db-card,.db-panel{background:var(--card,#171e26);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}.db-card strong{font-size:22px;display:block;margin:6px 0}.db-muted{color:var(--muted,#8b9eb4)}.db-warn{color:#e9a23c}.db-scroll{overflow:auto;margin-top:12px}.db-table{width:100%;border-collapse:collapse;font-size:11px}.db-table th,.db-table td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}.db-table th{background:#202a36;color:#90a5bc}.db-table tbody tr:hover{background:#223d60;cursor:pointer}.db-table td.db-name{max-width:150px;overflow-wrap:anywhere}.db-table td.db-why{white-space:normal;min-width:170px;max-width:280px;vertical-align:top}.db-why .db-clamp{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;word-break:break-word;line-height:1.5;font-size:12px}.db-why.open .db-clamp,#db-rank-table.why-all .db-clamp{display:block;-webkit-line-clamp:unset;line-clamp:none;overflow:visible}.db-why .db-more{display:none;margin-top:2px;color:var(--accent);font-size:12px;cursor:pointer;user-select:none}.db-why.more .db-more{display:inline-block}.db-why .db-more::before{content:"展開 ▾"}.db-why.open .db-more::before{content:"收合 ▴"}#db-rank-table.why-all .db-more{display:none}#db-why-all{padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card2);color:var(--tx);font-size:12px}.db-tx .db-xr{display:inline-block;margin-left:6px;padding:0 6px;border:1px solid var(--line);border-radius:6px;color:var(--tx);white-space:normal}.db-table .db-name{white-space:normal;min-width:95px}.db-stopped{opacity:.48}.db-medal{display:inline-flex;width:23px;height:23px;align-items:center;justify-content:center;border-radius:50%;background:#e7af37;color:#111}.db-medal.m2{background:#c0cad5}.db-medal.m3{background:#bd7b42}.db-stale{display:inline-block;color:#efaa42;border:1px solid #80541f;border-radius:5px;padding:1px 3px}.db-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.db-panel h3{font-size:14px;margin:0 0 10px}#db-detail{margin-top:16px;line-height:1.9}.db-tx{padding:4px 0;border-bottom:1px solid var(--line)}.db-chart{width:100%;height:170px}.db-quote{text-align:right;color:#47be82}.db-note{margin:7px 0}body:has(#tab-rank.on),body:has(#tab-arena.on){max-width:none}body:has(#tab-rank.on) main,body:has(#tab-arena.on) main{max-width:1800px;margin:auto}.db-table td:first-child{position:sticky;left:0;background:var(--card,#171e26);z-index:1}
 @media(max-width:650px){.db-cards{grid-template-columns:1fr 1fr}.db-layout{grid-template-columns:1fr}.db-card{padding:10px}.db-card strong{font-size:18px}#tab-rank .db-table{min-width:1250px}nav.tabs button{padding:9px 2px;font-size:11px}.db-quote{font-size:10px}}
-.db-scroll{max-height:70vh}.db-table th{position:sticky;top:0;z-index:3;color:#d9e5f3}.db-table td:nth-child(2){position:sticky;left:40px;background:#171e26;z-index:1}.db-table td:first-child{min-width:28px}.db-table th:first-child{left:0;z-index:4}.db-table th:nth-child(2){left:40px;z-index:4}.db-filters{display:flex;gap:10px;margin:14px 0}.db-filters input,.db-filters select{max-width:240px;padding:9px;background:#202a36;color:#edf3fa;border:1px solid #52667b;border-radius:7px}#tab-arena{color:#e5edf7}#tab-arena .db-muted,#tab-arena small{color:#b9c9da}.db-card strong{color:#f3f7ff}
+.db-scroll{max-height:70vh;max-height:min(70vh,calc(100dvh - 190px));-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior-x:contain}.db-feedwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior-x:contain;margin-top:10px}#db-feed-table{min-width:0;font-size:10.5px}#db-feed-table th,#db-feed-table td{position:static;padding:6px 3px}#db-feed-table td:first-child{white-space:normal;min-width:34px;max-width:40px}#db-feed-table td:nth-child(2){white-space:normal;overflow-wrap:anywhere;min-width:70px;max-width:96px}#db-feed-table td:nth-child(7){white-space:normal;min-width:52px}#db-feed-table tbody tr:hover{cursor:default}.db-table th{position:sticky;top:0;z-index:3;color:#d9e5f3}.db-table td:nth-child(2){position:sticky;left:40px;background:#171e26;z-index:1}.db-table td:first-child{min-width:28px}.db-table th:first-child{left:0;z-index:4}.db-table th:nth-child(2){left:40px;z-index:4}.db-filters{display:flex;gap:10px;margin:14px 0}.db-filters input,.db-filters select{max-width:240px;padding:9px;background:#202a36;color:#edf3fa;border:1px solid #52667b;border-radius:7px}#tab-arena{color:#e5edf7}#tab-arena .db-muted,#tab-arena small{color:#b9c9da}.db-card strong{color:#f3f7ff}
 .db-notes-bar{margin:10px 0;padding:8px 10px;border:1px solid #80541f;border-radius:8px;background:#2a2113;color:#f1c27a;line-height:1.6}.db-acc{display:inline-block;color:#9fc3ff;border:1px solid #3d5f8f;border-radius:5px;padding:1px 4px;font-size:10px}.db-off{color:#8b9eb4;font-size:10px}.db-accrow td{color:#c3d0de}.db-table .db-nt{white-space:normal;min-width:160px;max-width:240px;font-size:10px;color:#f1c27a}.db-day{margin-top:12px}.db-day-h{font-weight:600;color:#f3f7ff}#db-days .db-table td,#db-slots .db-table td{position:static}.db-card strong{overflow-wrap:anywhere;font-size:clamp(14px,1.6vw,22px)}.db-filters>*{flex:1 1 0;min-width:0}
 </style>
 </head>
@@ -374,7 +374,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
       <div class="card" id="shadowCard" style="display:none"><h2>影子帳本（觀察用・不是真實部位）</h2><div id="shadow"></div></div>
       <div class="card span2"><h2>全部模擬策略<span class="r" id="abAt"></span></h2><div id="ab"></div></div>
       <div class="grid">
-        <div class="card"><h2>今天的訊號與核准</h2><div id="sigs"></div></div>
+        <div class="card"><h2>今天的訊號</h2><div id="sigs"></div></div>
         <div class="card"><h2>今天的成交</h2><div id="trades"></div></div>
         <div class="card" id="hlCard"><h2>Hyperliquid 聰明錢共識</h2><div id="hl"></div></div>
       </div>
@@ -546,8 +546,8 @@ function renderTrade(){
   // signals & approvals
   if(dk){const s=dk.sig||{},a=dk.apr||{};const today=d=>{d=pt(d);return d&&d.toDateString()===new Date().toDateString()};
     let h=`<div class="row"><div class="k">市場狀態</div><div class="v">${s.bull===true?'<span class="chip up">多頭</span>':s.bull===false?'<span class="chip dn">非多頭</span>':"—"}</div></div>`;
-    h+=`<div class="row"><div class="k">掃描訊號</div><div class="v">${s.n??0} 個${s.act&&s.act.length?`・可進場 <b>${s.act.map(esc).join("、")}</b>`:"・沒有可進場"}${s.near&&s.near.length?`<div class="mut" style="font-size:12.5px">差一點：${s.near.map(esc).join("、")}</div>`:""}</div><div class="t">${s.at?(today(s.at)?"":"非今天 ")+hm(s.at):""}</div></div>`;
-    h+=`<div class="row"><div class="k">風控核准</div><div class="v">${a.ok&&a.ok.length?a.ok.map(x=>`<span class="chip ok">${esc(String(x[0]).replace("USDT",""))}${x[1]?` ${f2(x[1])}U`:""}</span>`).join(" "):"沒有核准"}${a.rej?`<span class="mut">・否決 ${a.rej}</span>`:""}</div><div class="t">${a.at?(today(a.at)?"":"非今天 ")+hm(a.at):""}</div></div>`;
+    if(s.at&&today(s.at))h+=`<div class="row"><div class="k">掃描訊號</div><div class="v">${s.n??0} 個${s.act&&s.act.length?`・可進場 <b>${s.act.map(esc).join("、")}</b>`:"・沒有可進場"}${s.near&&s.near.length?`<div class="mut" style="font-size:12.5px">差一點：${s.near.map(esc).join("、")}</div>`:""}</div><div class="t">${s.at?(today(s.at)?"":"非今天 ")+hm(s.at):""}</div></div>`;
+    else h+='<div class="row"><div class="k">掃描訊號</div><div class="v mut">今天還沒有新掃描（舊紀錄不顯示）</div></div>';
     $("#sigs").innerHTML=h;
     $("#trades").innerHTML=(dk.tr&&dk.tr.length)?dk.tr.map(t=>`<div class="row"><div class="k">${esc(t[0])}</div><div class="v"><b class="${/sell|close|exit/i.test(t[1]||"")?"dn":"up"}">${/sell|close|exit/i.test(t[1]||"")?"賣":"買"}</b> ${esc(String(t[2]||"").replace("USDT",""))}</div><div class="t num">${t[3]==null?"":f2(t[3])+" U"}</div></div>`).join(""):'<div class="empty">今天還沒有成交</div>';
     if(dk.hl&&dk.hl.top&&dk.hl.top.length){$("#hlCard").style.display="";$("#hl").innerHTML=`<div class="hl">${dk.hl.top.map(r=>`<b>${esc(r[0])}</b><span class="mut">${esc(r[1]||"")}</span><span class="num"><span class="up">多 ${r[2]??0}</span> / <span class="dn">空 ${r[3]??0}</span></span>`).join("")}</div><div class="dim" style="font-size:12px;margin-top:8px">${dk.hl.w?dk.hl.w+" 個錢包・":""}${hm(dk.hl.at)}</div>`}
@@ -556,15 +556,14 @@ function renderTrade(){
   // alerts (human topic: never show command texts — they carry the PIN)
   const al=human.filter(m=>!isCmdText(m)&&!isReply(m)&&m.title!=="cd").sort((a,b)=>b.time-a.time).slice(0,12);
   $("#alerts").innerHTML=al.length?al.map(m=>{const t=(m.title||"")+" "+(m.message||"");const ic=/停機|halt|⛔|🛑/i.test(t)?"🛑":/買進|BUY|進場/i.test(t)?"🟢":/賣|平倉|出場/.test(t)?"🔻":/記憶體|CPU|磁碟|主機|VM|看門狗/i.test(t)?"🖥️":/研究|算力|帳號/.test(t)?"🧠":"🔔";
-    return`<div class="alert p${m.priority||3}"><div class="ic">${ic}</div><div style="flex:1;min-width:0"><div class="ttl">${esc(m.title||"通知")}</div><div class="msg">${esc(m.message||"")}</div></div><div class="dim" style="font-size:12px;white-space:nowrap">${hm(m.time)}</div></div>`}).join(""):'<div class="empty">24 小時內沒有通知</div>';
+    return`<div class="alert p${m.priority||3}"><div class="ic">${ic}</div><div style="flex:1;min-width:0"><div class="ttl">${esc(m.title||"通知")}</div><div class="msg">${esc(dbMsgClean(m.message))}</div></div><div class="dim" style="font-size:12px;white-space:nowrap">${hm(m.time)}</div></div>`}).join(""):'<div class="empty">24 小時內沒有通知</div>';
   // system
   let sh="";
   if(dk){sh+=`<div class="row"><div class="k">運作模式</div><div class="v">${dk.fb?'<b class="warnc">雲端自動模式</b>（Bobo 離線）':'<b class="okc">正常</b>（Bobo 在線，雲端主機寫帳本）'}</div></div>`;
-    sh+=`<div class="row"><div class="k">本機最後聯絡</div><div class="v">${hm(dk.box_last)} <span class="mut">${ago(dk.box_last)}</span></div></div>`;
-    sh+=`<div class="row"><div class="k">雲端主機回報</div><div class="v">${hm(dk.vm_at)} <span class="mut">${ago(dk.vm_at)}</span></div></div>`;
+    sh+=dbSyncRows();   // r4：本機最後聯絡／雲端主機回報 → paper60（Mac）帳本更新時間
     if(dk.halts&&dk.halts.length)sh+=`<div class="row"><div class="k">暫停/停機</div><div class="v warnc">${dk.halts.map(esc).join("、")}</div></div>`;}
   const vm=(C&&C.vm)||(P&&P.vm);
-  if(vm&&vm.rows)sh+=vm.rows.filter(r=>/連線|看門狗|記憶體|自動模式/.test(r.k)).map(r=>`<div class="row"><div class="k">${esc(r.k)}</div><div class="v ${lvC(r.l)}">${esc(r.v)}</div></div>`).join("");
+  if(vm&&vm.rows)sh+=vm.rows.filter(r=>/連線|看門狗|記憶體|自動模式|Mac 心跳/.test(r.k)).map(r=>`<div class="row"><div class="k">${esc(r.k)}</div><div class="v ${lvC(r.l)}">${esc(r.v)}</div></div>`).join("");
   $("#sys").innerHTML=sh||'<div class="empty">—</div>';
 }
 const lvC=l=>l==="ok"?"":l==="warn"?"warnc":l==="bad"?"badc":"mut";
@@ -577,7 +576,8 @@ function renderDecisions(){
   if(!dk){el.innerHTML='<div class="empty">—</div>';return}
   let dc=dk.dc;
   if(!Array.isArray(dc)){dc=[];const a=dk.apr||{};const today=d=>{d=pt(d);return d&&d.toDateString()===new Date().toDateString()};
-    if(a.at&&today(a.at)){(a.ok||[]).forEach(x=>dc.push([hm(a.at),a.by||"Risk 例行（Bobo）","buy",`核准買 ${String(x[0]).replace("USDT","")}`]));if(!(a.ok||[]).length)dc.push([hm(a.at),a.by||"Risk 例行（Bobo）","skip",`今天不買${a.rej?`（否決 ${a.rej} 個）`:""}`])}}
+  }
+  dc=dc.filter(d=>/Risk/i.test(String(d[1]||""))===false);   // r4：Risk 已關閉，不顯示 Risk 例行
   const n={};dc.forEach(d=>n[d[2]]=(n[d[2]]||0)+1);
   let sum=`<div class="dcsum"><span class="chip ok">🤖 全自動・你不用操作</span>`;
   if(n.buy)sum+=`<span class="chip up">買 ${n.buy}</span>`;if(n.sell)sum+=`<span class="chip dn">賣 ${n.sell}</span>`;
@@ -692,7 +692,7 @@ function renderAllBooks(){
 function renderDsb(){  // 2026-10-29: one line only (user: 就寫說還剩多少就好了)
   const src=(C&&C.dsb!=null)?C:((P&&P.dsb!=null)?P:null),v=src?Number(src.dsb):NaN;
   $("#dsb").textContent=isFinite(v)?`DeepSeek 還剩 ${v.toFixed(2)} 元${src.dsc?" "+src.dsc:""}`:"DeepSeek 還剩 —（還沒讀到餘額）";}
-function renderAll(){try{renderDsb()}catch(e){}renderHeader();renderDecisions();renderTrade();renderCompute();renderReplies();try{renderAllBooks()}catch(e){}renderDashBooks()}
+function renderAll(){try{renderDsb()}catch(e){}renderHeader();renderDecisions();renderTrade();renderCompute();renderReplies();try{renderAllBooks()}catch(e){}dbAutoRender()}
 
 const DB_WHY = {"swing": "價格突破唐奇安通道才進場，依波段出場規則持有。", "short": "一小時 RSI 回升，且四小時價格高於長期均線才進場。", "adx": "只觀察比特幣，以 ADX 趨勢強度決定進出。", "hr_ll": "先觀察領漲幣，再找落後且開始跟漲的幣。", "hr_ma": "找價格動能正在加速的幣，依風險規則限制部位。", "hr_dd": "找相對大盤強勢、走勢開始脫鉤的幣。", "hr_ps": "拋物線指標翻多後進場，翻空或風險條件觸發時退出。", "rb": "價格突破近期區間上緣才進場。", "fbd": "根據資金費率與現貨期貨基差尋找訊號。", "rb24": "以二十四日區間突破訊號選幣。", "ppo236": "以快慢均線百分比振盪訊號觀察動能。", "c32": "觀察三十二日動能加速訊號。", "cvc": "觀察波動聚集後的策略訊號。", "v9270": "每四小時觀察成交量高潮訊號。", "meme": "迷因幣突破前二十四根高點，且成交量超過歷史中位數門檻。", "grid": "固定幣種與網格區間，低買高賣；部分版本有 ADX 開關。", "farm": "依已登記候選策略的封存訊號或權重運行。", "dc2x": "兩倍槓桿唐奇安通道影子研究，不影響主帳。", "observe": "依獨立觀察策略的已收盤訊號選幣。"};
 const dbNum=(v,suffix='')=>v==null?'—':Number(v).toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:2})+suffix;
@@ -729,10 +729,33 @@ function dbSlots(books,a){
 }
 // r3：決策紀錄（選幣方法、為什麼選這個幣）兩行摺疊；點格子展開／收合，狀態跨 30 分重繪保留
 const DB_OPEN=new Set();let dbWhyAll=false;
+// r4 (3) 捲動：原本每 30 秒 schedule→refresh→renderAll→renderDashBooks 用 innerHTML 重建排行／競技場，
+// 內層 .db-scroll 被換成新元素 → scrollTop/scrollLeft 歸零、iOS 手指下的元素消失、慣性捲動中斷＝「捲不動」。
+// 改：自動刷新只在排行資料（ts）或配色變了才重畫；真的重畫時保存並還原每個捲動框位置與搜尋／理論篩選。
+let dbDrawn='';
+function dbKey(){return DB?String(DB.ts)+'|'+(DB.b||DB.books||[]).length+'|'+document.documentElement.className:''}
+function dbAutoRender(){if(DB&&dbKey()===dbDrawn){dbWhyMark();return}renderDashBooks()}
+function dbScrollBoxes(){return [...document.querySelectorAll('#tab-rank .db-scroll,#tab-arena .db-scroll,#tab-arena .db-feedwrap')]}
+function dbScrollSave(){const s=document.getElementById('db-search'),t=document.getElementById('db-theory');return{sc:dbScrollBoxes().map(e=>[e.scrollTop,e.scrollLeft]),q:s?s.value:'',th:t?t.value:''}}
+function dbScrollRestore(k){if(!k)return;dbScrollBoxes().forEach((e,i)=>{const p=k.sc[i];if(p){e.scrollTop=p[0];e.scrollLeft=p[1]}});const s=document.getElementById('db-search'),t=document.getElementById('db-theory');if(s&&k.q)s.value=k.q;if(t&&k.th&&[...t.options].some(o=>o.value===k.th))t.value=k.th;if((k.q||k.th)&&s&&s.oninput)s.oninput()}
+// r4 (1) 每一筆買賣列表（競技場底部）：資料＝推播包 ftr（dash_books 執行時讀 paper60 各組與 multi_runner 帳本，新→舊最多 200 筆）。
+// 舊推播包（r3，無 ftr）→ 用各帳本最近 5 筆拼湊並註明。
+function dbFeed(db,books){let rows=Array.isArray(db.ftr)?db.ftr:null,note='';
+ if(rows===null){rows=[];books.forEach(b=>(b.tr||[]).forEach(r=>rows.push([r[0],b.name,b.id,r[2],r[1],r[4]==null?null:String(r[4]),null,r.length>6?r[6]:null])));rows.sort((x,y)=>String(y[0]).localeCompare(String(x[0])));rows=rows.slice(0,200);note='・舊版推播包：每組只有最近 5 筆、無損益，下一次 30 分推送後完整'}
+ const slot=id=>String(id||'').startsWith('paper60:')?` <span class="db-muted">${esc(String(id).slice(8))}</span>`:'';
+ const body=rows.map(r=>`<tr><td class="num">${esc(r[0])}</td><td>${esc(r[1]||r[2]||'—')}${slot(r[2])}</td><td>${esc(String(r[3]||'—').replace(/USDT$/,''))}</td><td class="${r[4]==='買'?'up':'dn'}">${esc(r[4]||'—')}</td><td class="num">${esc(r[5]==null?'—':r[5])}</td><td class="num ${r[6]==null?'mut':cls(r[6])}">${esc(r[6]==null?'—':dbSign(r[6]))}</td><td>${esc(r[7]||'—')}</td></tr>`).join('');
+ return `<div class="db-panel" id="db-feed"><h3>每一筆買賣（最近 ${rows.length} 筆，新→舊）</h3><small>ⓘ 紙上交易・paper60 各組＋multi_runner＋其他觀察帳本・損益＝該筆出場已實現（USDT），進場列與沒有出場理由的帳本顯示「—」${esc(note)}</small>`+(rows.length?`<div class="db-feedwrap"><table class="db-table" id="db-feed-table"><thead><tr>${['時間','策略','幣','買/賣','價格','損益','出場理由'].map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table></div>`:'<p>尚無成交</p>')+'</div>'}
+// r4 (2) 交易分頁：主機與同步卡改用 paper60（Mac）帳本最後更新時間；最新通知去掉已停用的波段回撤／Risk 行
+function dbSyncRows(){let db=DB;if(db===null&&dataTopic){try{db=JSON.parse(localStorage.getItem('cd_db_'+dataTopic))}catch(e){}}
+ const r=(k,v)=>`<div class="row"><div class="k">${k}</div><div class="v">${v}</div></div>`;
+ if(db===null||typeof db!=='object')return r('paper60 帳本','<span class="mut">尚無資料（打開「排行」頁會載入）</span>');
+ const ts=(db.b||db.books||[]).filter(b=>String(b.id).startsWith('paper60:')).map(b=>pt(b.asof)).filter(Boolean).map(d=>d.getTime()),last=ts.length?new Date(Math.max(...ts)):null;
+ return r('paper60 帳本最後更新（Mac）',last?`${hm(last)} <span class="mut">${ago(last)}</span>`:'—')+r('排行資料產生（box 同步）',db.ts?`${hm(db.ts)} <span class="mut">${ago(db.ts)}</span>`:'—')}
+function dbMsgClean(s){return String(s||'').split('\n').filter(l=>/^(波段回撤|風控核准|掃描訊號)|Risk 例行/.test(l.trim())===false).join('\n')}
 function dbWhyCell(id,k,txt){return `<td class="db-why${DB_OPEN.has(id+"|"+k)?" open":""}" data-w="${k}" title="${esc(txt)}"><div class="db-clamp">${esc(txt)}</div><span class="db-more" role="button" aria-label="展開或收合"></span></td>`}
 function dbWhyMark(){$$("#db-rank-table td.db-why").forEach(c=>{const d=c.firstElementChild;c.classList.toggle("more",c.offsetParent?d.scrollHeight>d.clientHeight+1||c.classList.contains("open"):String(d.textContent).length>28)})}
 function renderDashBooks(){
- const db=DB,src=db;
+ const db=DB,src=db,dbKeep=dbScrollSave();
  if(!db){for(const id of ['rank','arena'])$('#tab-'+id).innerHTML='<div class="db-panel">排行資料尚未送達<p>請到交易頁查看「全部模擬策略」。</p></div>';return}
  const books=db.b||db.books||[], t=db.tot,a=db.ar,byid=id=>books.find(b=>b.id===id),first=byid(t.first),last=byid(t.last);
  const quote=src.dk&&src.dk.pxok!==false&&src.dk.bk&&src.dk.bk.some(b=>b[2]!=null)?'即時行情 data-api.binance.vision':'成本價估值';
@@ -752,7 +775,7 @@ function renderDashBooks(){
  const act={promoted:'加碼',eliminated:'淘汰',new:'新生',keep:'保留'};
  let ar='<div class="db-panel"><h3>'+(a.evo?'進化規則與既有停止規則':'既有固定自動停止規則')+'</h3><p>看板僅顯示紀錄，不執行淘汰與繁殖</p>'+a.rules.map(r=>`<div class="db-note">${esc(r)}</div>`).join('')+'</div>'+dbDays(a)+dbSlots(books,a)+'<div class="db-layout"><div class="db-panel"><h3>最近一次'+(a.evo?'結算':'彙總')+'（保留／停止／新加入）</h3><small>ⓘ '+(a.evo?'採最新一批結算紀錄':'推導採最近 21:00 往前 24 小時')+'</small>'+dbTable(['結果','策略','時間','原因'],[...a.last.keep.map(id=>['保留',byid(id)?.name||id,'—','—']),...a.last.out.map(r=>['停止',byid(r[0])?.name||r[0],dbTime(r[1]),dbReason(r[2])]),...a.last.new.map(id=>['新加入',byid(id)?.name||id,'—','—'])])+'</div><div class="db-panel"><h3>理論排行：哪一套理論最強</h3><small>ⓘ 依目前參賽成員報酬平均排列</small>'+dbTable(['理論','成員數','平均','中位數','最佳','最佳成員'],a.fams.map(f=>[f[1],f[2],dbSign(f[3])+'%',dbSign(f[4])+'%',dbSign(f[6])+'%',byid(f[5])?.name||f[5]]))+'</div><div class="db-panel"><h3>每日結算歷史：最佳／中位數／平均 報酬</h3><small>ⓘ '+(a.evo?'結算紀錄按輪彙總，只計有名次的組':'推導模式採台北日最後快照')+'</small>'+dbChart(a.hist)+dbTable(['日期','最佳','中位數','平均','本數'],a.hist.map(r=>[r[0],...r.slice(1,4).map(v=>dbSign(v)+'%'),r[4]]))+'</div><div class="db-panel"><h3>名人堂（歷來最強，含已停止）</h3><small>ⓘ 結算紀錄的名次報酬或快照最高點；未記錄日期顯示 —</small>'+dbTable(['策略','最高報酬','日期','狀態'],a.hof.map(r=>[r[1],dbSign(r[2])+'%',r[3],r[4]?'仍在跑':'已停止']))+'</div></div>';
  ar=arCards+dbNotesBar(t)+`<div class="db-note">來源：${esc(a.source)} ${a.settlement_file?'': '—（尚無結算紀錄檔）'}${a.bad_lines?`<span class="db-warn">・${esc(a.bad_lines)} 行無法讀取已略過</span>`:''}</div>`+(a.settlement_file&&a.records&&a.records.length?'<div class="db-panel"><h3>最近一次結算明細</h3>'+dbTable(['結果','組別','名次','報酬','原因','本金','交易筆數','上線天數'],a.records.map(r=>[act[r[1]]||r[1],dbSlot(r[0],r[4])+(byid(r[0])?' '+byid(r[0]).name:''),r[2]??'—',dbSign(r[5])+'%',dbReason(r[3]),dbNum(r[6]),r[7]??'—',r[8]==null?'—':Math.floor(r[8])]))+'</div>':'')+ar;
- $('#tab-arena').innerHTML=ar;
+ $('#tab-arena').innerHTML=ar+dbFeed(db,books);dbScrollRestore(dbKeep);dbDrawn=dbKey();
 }
 function dbChart(hist){if(!hist.length)return '<p>—</p>';const vals=hist.flatMap(r=>r.slice(1,4)),lo=Math.min(...vals),hi=Math.max(...vals),span=hi-lo||1,colors=['#eab24b','#55c99f','#6faaff'];return '<svg class="db-chart" viewBox="0 0 500 170" role="img" aria-label="最佳、中位數、平均報酬折線">'+[1,2,3].map((k,i)=>`<polyline fill="none" stroke="${colors[i]}" stroke-width="2" points="${hist.map((r,j)=>`${20+j*460/Math.max(1,hist.length-1)},${140-(r[k]-lo)*110/span}`).join(' ')}"/><text x="${20+i*140}" y="165" fill="${colors[i]}">${['最佳','中位數','平均'][i]}</text>`).join('')+'</svg>'}
 
@@ -830,7 +853,7 @@ function tickClose(){clearTimeout(closeT);const u=+LS.get(K.close)||0,left=u-Dat
 
 // ---------- misc UI ----------
 let toastT=null;function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("on"),2600)}
-function setTab(t){$$("nav.tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));$$(".tab").forEach(s=>s.classList.toggle("on",s.id==="tab-"+t));LS.set("cd_tab",t);loadDB().then(renderDashBooks).catch(()=>{});scrollTo({top:0})}
+function setTab(t){$$("nav.tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));$$(".tab").forEach(s=>s.classList.toggle("on",s.id==="tab-"+t));LS.set("cd_tab",t);loadDB().then(dbAutoRender).catch(()=>{});scrollTo({top:0})}
 $$("nav.tabs button").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 function setColor(c){document.documentElement.classList.toggle("redup",c==="r");LS.set(K.col,c);$$("#colorSeg button").forEach(b=>b.classList.toggle("on",b.dataset.c===c))}
 $$("#colorSeg button").forEach(b=>b.onclick=()=>{setColor(b.dataset.c);renderAll()});
